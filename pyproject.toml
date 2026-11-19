@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "neo4j-spanner-export"
+version = "0.1.0"
+description = "Offline Neo4j (4.4 / 5.x) to Google Cloud Spanner Graph CSV exporter and verifier"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "neo4j>=5.20,<6",
+    "PyYAML>=6.0",
+    "rich>=13.0",
+    "google-cloud-spanner>=3.49",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+]
+
+[project.scripts]
+neo4j-spanner-export = "neo4j_spanner_export.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

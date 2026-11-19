@@ -1,0 +1,56 @@
+# Re-test report
+
+Previous campaign: `rb-20261119-015500-a1b2` · Re-test campaign: `rb-20261119-083000-c3e4`
+
+Verdicts: **Fixed** = 36, **Still open** = 2 · New defects: **0**
+
+## Campaign-1 defects
+
+| DEF | Hypothesis | Sev | Title | Verdict | Re-test tests | Evidence (re-test) |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| DEF-001 | H01 | P0 | verify cannot catch coercion bugs (shares coerce_value()) | **Fixed** | H-01, H-01(golden-vs-verify) | rc=1 new failures=['sample:PkStr:ps_note:{"sku": "S-005"}'] |
+| DEF-002 | H02 | P0 | DateTime ns truncated to µs; verify compares only to ms | **Fixed** | D-14(T0), D-14(T3:VDateTime), H-04 | detected per delta: {'1us': (1, True), '1ms': (1, True)} |
+| DEF-003 | H03 | P0 | INT64+FLOAT64 widening loses precision > 2^53; verify isclose hides it | **Fixed** | D-05, D-05(T3:TConf), D-13(T3:VListInt), H-05 | 1-ULP FLOAT64 change detected=True; INT>2^53 in FLOAT64 col changed by 2 detected=True |
+| DEF-004 | H04 | P0 | Type overrides not validated (truncation / silent false / invalid DDL types) | **Fixed** | A-08, A-08(T2), D-10, D-10(T1), D-11 | REJECTED by tool before Spanner: ConfigError: Invalid Spanner type 'VARCHAR' on Ovr.age. |
+| DEF-005 | H05 | P0 | pk_overrides not checked for uniqueness or legal PK type | **Fixed** | B-09, B-10, B-10(T2) | {'B10_pk_JSON': 'REJECTED by tool before Spanner: ConfigError: Column Jpk.jk has type JSON, which is not legal as a Spanner PRIMARY KEY.', 'B10_pk_ARRAY': 'REJECTED by tool before Spanner: ConfigError: Column Jpk.jk has type ARRAY<STRING(MAX)>, which is not le |
+| DEF-006 | H08 | P0 | Same property name, different types across node labels breaks graph DDL | **Fixed** | F-05 | REJECTED by tool before Spanner: NamingError: Property 'code' has conflicting types across node tables: Person has INT64 vs Company has STRING(MAX). Fix by adding a rename under `nodes.Company.column_renames` or aligning types via `override`. |
+| DEF-007 | H06 | P1 | Mixed-type unique keys collapse to duplicate STRING PKs | **Fixed** | B-11 | rejected: PK column 'kid' on 'K' has mixed types (['INT64', 'STRING']); widening to STRING(MAX) can collapse distinct Neo4j keys into duplicate Spanner PKs. Normalize types in Neo4j or use _neo4j_id. |
+| DEF-008 | H07 | P1 | NaN/Infinity inside lists -> invalid JSON | **Fixed** | D-08, D-08(T3)/G-04 | export of [1.5,NaN]/[Infinity,2.0] list values: ('rejected', 'ValueError: Cannot serialize ARRAY<FLOAT64> value to RFC8259 JSON (NaN/Infinity is not allowed): Out of range float values are not JSON compliant: nan') |
+| DEF-009 | H09 | P1 | Conflicting ARRAY/JSON types on a shared edge label emit an invalid CAST (CAST(NULL AS STRING(MAX)) and INT->STRING are accepted) | **Fixed** | F-06, F-07 | ARRAY vs INT64: REJECTED by tool before Spanner: NamingError: Edge property 'val' on shared LABEL 'TAGS' has incompatible types (ARRAY<INT64> vs INT64) that cannot be CAST in Spanner Graph DDL. Fix by adding a rename under `edges.Person__TAGS__Company.column_r |
+| DEF-010 | H10 | P1 | Secondary labels not queryable as GQL labels | **Still open** | F-09 | Cypher MATCH (n:Employee) -> 200; GQL MATCH (n:Employee) -> ERROR 400 Failed to find element label [Employee] in PropertyGraph: RbR3 [at 1:21]\nGRAPH RbR3 MATCH (n:Employee) RETURN COUNT(*) AS c\n                    ^, request_id = 1.3742181418422252134.1.82.1 |
+| DEF-011 | H11 | P1 | FK/index name truncation collisions | **Fixed** | C-07, C-07(T0) | all statements accepted |
+| DEF-012 | H15 | P1 | --gcs-prefix / --graph-name injection | **Fixed** | F-08, L-03, L-04 | my-graph -> REJECTED by tool before Spanner: NamingError: Invalid Spanner graph identifier 'my-graph' (from 'my-graph') in property graph. Must match [A-Za-z][A-Za-z0-9_]* and be <= 128 chars. Add a rename under `graph_name` in schema_mapping.yaml.; Select ->  |
+| DEF-013 | H16 | P1 | Stale shards loaded (local dir / GCS prefix) | **Fixed** | G-09(H16-GCS), K-05, K-10 | fresh-dir kill leaves complete-looking bundle=False; re-run kill: old runbook/manifests still present=True, rows on disk=300000/300000 (complete first run had 300000), truncated shards=[] |
+| DEF-014 | H18 | P1 | --sample-size type drift crashes export with partial bundle | **Fixed** | A-06, A-06(T1,manual-mapping) | export raised ValueError: invalid literal for int() with base 10: 'not-a-number'; partial files left: [] |
+| DEF-015 | H19 | P1 | verify false missing_in_neo4j for widened/TIMESTAMP/BYTES PKs | **Still open** | H-06 | Mostly fixed. Clean R2 DB: verify writes its report; TIMESTAMP-PK (PkTs) and BYTES-PK (PkBytes, PkFloat__REL_D__PkBytes) lookups now pass. Remaining false `missing_in_neo4j`: PkWide wk '1','2','3' (Spanner STRING via user `override: STRING(MAX)`, Neo4j stores  |
+| DEF-016 | H21 | P1 | Runbook not idempotent / no resume | **Fixed** | G-09(H21) | runbook checks for an existing database before `databases create` and offers resume flags (SKIP_DB_CREATE/SKIP_UPLOAD/SKIP_DATAFLOW/SKIP_STAGE_0x): existence check present=True, resume=True |
+| DEF-017 | H22 | P1 | Out-of-range dates crash / corrupt export | **Fixed** | D-15, D-15(T0) | export raised ValueError: Unsupported or out-of-range Neo4j temporal/hydration value: <neo4j._codec.hydration._common.BrokenHydrationObject object at 0x7f62ecec8d70> |
+| DEF-018 | NEW-DIGITNAME | P1 | Original property/label names starting with a digit break CREATE PROPERTY GRAPH | **Fixed** | C-05(T0), C-05[v44], C-05[v5] | first export: NamingError: Spanner Graph property alias '1st' in node table 'VIP_Customer' cannot start with a digit or contain '\' or '`'. Add a rename under `nodes.VIP Customer.column_renames` in schema_mapping.yaml.; after column_renames 1st->first_x: expor |
+| DEF-019 | NEW-HANG | P1 | A single rejected row makes the Dataflow load hang (no invalidOutputPath); oversized values not detected | **Fixed** | E-07(T3:r5) | value of 2,600,000 4-byte chars (10.4 MB): runbook rc=0 elapsed=1201s, Rj rows in Spanner=2/2, invalid_records objects=0 |
+| DEF-020 | NEW-NOEDGE | P1 | load_runbook.sh fails for graphs without relationships (missing edges/ directory) | **Fixed** | G-10(T3:nodes-only), G-10(nodes-only) | nodes-only graph (no relationships): runbook rc=0, Frag rows=2, stages=['1. Create Spanner database with Stage 01 DDL (idempotent)', '2. Upload CSV shards and manifests to GCS', '3. Run Dataflow job 1 (Nodes)', '4. Skip Dataflow job 2 (Edges: no edge tables)', |
+| DEF-021 | NEW-TAB | P1 | Tab delimiter is accepted by export but breaks the Dataflow load | **Fixed** | E-06(T3:r3) | R3 exported with --delimiter '\t': runbook rc=0; Spanner counts={'Person': 2000, 'Company': 50, 'Event': 60000, 'Person__KNOWS__Person': 6053, 'Person keys containing TAB': 0} expected={'Person': 2000, 'Company': 50, 'Event': 60000, 'Person__KNOWS__Person': 60 |
+| DEF-022 | NEW-UNESCAPE | P1 | --emit-unescape generates invalid SQL (03_unescape.sql) and aborts the load | **Fixed** | E-03(unescape) | load with --emit-unescape succeeded (rc=0); strings after 03_unescape.sql: mismatches={} |
+| DEF-023 | H12 | P2 | dst_ prefix exceeds 128 chars | **Fixed** | C-08, C-08(T0) | all statements accepted |
+| DEF-024 | H13 | P2 | Backtick escaping in graph DDL | **Fixed** | C-09 | backtick+backslash: REJECTED by tool before Spanner: NamingError: Spanner Graph LABEL alias 'We`ird\\Label' in node table 'WeirdLabel' cannot start with a digit or contain '\' or '`'. Add a rename under `table_renames` in schema_mapping.yaml. \|\| backtick onl |
+| DEF-025 | H14 | P2 | Delimiter '~' breaks Dataflow parameter separator | **Fixed** | G-06 | columnDelimiter seen by Dataflow='~'; parsed params=[{'instanceId': 'YOUR_SPANNER_INSTANCE', 'databaseId': 'neo4j_graph', 'importManifest': 'gs://b/run/manifests/nodes_manifest.json', 'columnDelimiter': '~', 'fieldQualifier': '"', 'escape': '\\', 'nullString': |
+| DEF-026 | H17 | P2 | 0-row table -> manifest glob matches nothing | **Fixed** | K-03 | 0-row table: shards=0, manifest references table Gone: False; Dataflow behaviour on an empty glob not tested (GCP fault tests out of scope) |
+| DEF-027 | H20 | P2 | verify sampling limited to first 50k rows | **Fixed** | H-07 | 10,000 rows E050000..E059999 corrupted; verify --sample-rows 10000 mismatches in that range per seed: {1: (1, 20), 42: (1, 20)} |
+| DEF-028 | H23 | P2 | Spanner column limit not detected | **Fixed** | F-04(T1) | discovery of a 1,101-property label: DiscoveryError: Node table 'Wide' has 1101 columns, exceeding Spanner's limit of 1024 columns per table. |
+| DEF-029 | H25 | P2 | Empty DB -> invalid NODE TABLES () | **Fixed** | B-14[v44], B-14[v5], F-01[B14_nodes_only] | all statements accepted |
+| DEF-030 | H26 | P2 | Unknown/missing YAML keys -> raw TypeError | **Fixed** | A-04[missing_field], A-04[unknown_key] | rc=1 traceback=False tail=Error: Invalid fields in nodes.Person: NodeTableMapping.__init__() missing 1  required positional argument: 'spanner_table'  |
+| DEF-031 | NEW-DET | P2 | schema_mapping.yaml not byte-identical across Neo4j versions | **Fixed** | F-11b, I-01/F-11/A-09[g5], I-01/F-11/A-09[r2] | mapping differs only by creation order; diff lines: [] |
+| DEF-032 | NEW-EMPTY | P2 | An empty schema_mapping.yaml exports 0 rows with exit code 0 | **Fixed** | A-04[empty_file] | rc=1 traceback=False tail=Error: Schema mapping file  /tmp/pytest-of-jicong/pytest-27/test_A04_bad_yaml_clean_error_2/m.yaml is empty.  |
+| DEF-033 | NEW-EMPTYBYTES | P2 | Empty BYTES values become NULL after load | **Fixed** | D-19(T3:VBytes) | [] |
+| DEF-034 | NEW-JOBNAME | P2 | Dataflow job names collide when two loads start in the same second | **Fixed** | G-11(job-name) | job name template now neo4j-load-nodes-$$-${RANDOM}-$(date +%s) (includes PID and $RANDOM); 7 runbooks started within 18 s in campaign 2 without collisions |
+| DEF-035 | NEW-LABELCLASH | P2 | Node label and relationship type with the same name produce conflicting LABEL definitions | **Fixed** | C-11 | REJECTED by tool before Spanner: NamingError: Relationship type 'KNOWS' shares LABEL 'KNOWS' with a node label but has different properties. Rename the label or relationship type. |
+| DEF-036 | NEW-MONO | P2 | Monotonic-PK hotspot warning depends on Neo4j scan order | **Fixed** | B-15, B-15(T0) | _looks_monotonic results (scan-order independent expected): {'descending_ints': True, 'shuffled_dense_ints': True, 'random_uuids': False} |
+| DEF-037 | NEW-SIZE | P2 | Values above Spanner limits (STRING 2,621,440 chars / 10 MiB) are not detected before load | **Fixed** | E-07, E-07(T0) | 2.7M-char STRING -> raised (ValueError: STRING value of length 2700000 exceeds Spanner STRING(MAX) limit (2621440 chars)); 10 MiB+1 BYTES -> raised; 2.7M-char ARRAY JSON -> raised; 2.6M 4-byte chars (10.4 MB) -> ok (accepted by Spanner in R5, 2/2 rows) |
+| DEF-038 | NEW-UX | P2 | CLI surfaces operational/validation errors as raw Python tracebacks | **Fixed** | A-02, A-03, A-05, A-10, H-09, K-02(ux) | {"malformed_yaml": {"rc": 1, "traceback": false, "queries": {}}, "bad_cypher_gql": {"rc": 1, "traceback": false, "queries": {"badcy": [false, "{code: Neo.ClientError.Statement.SyntaxError} {message: Invalid input 'MATC': ex"], "badgql": [false, "400 Syntax err |
+
+## Tests blocked by NEW-DISCCRASH
+
+None.
+
+## New defects found in the re-test
+
+None.

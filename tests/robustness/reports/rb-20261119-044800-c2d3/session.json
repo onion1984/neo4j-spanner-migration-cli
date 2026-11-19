@@ -1,0 +1,43 @@
+{
+  "run_id": "rb-20261119-044800-c2d3",
+  "project": "driven-rig-474510-s8",
+  "instance": "neo4j-robust-fn",
+  "gcs_prefix": "gs://jicong/neo4j-robust/rb-20261119-044800-c2d3/",
+  "gcloud_project": "driven-rig-474510-s8",
+  "subnet_private_google_access": "True",
+  "dataflow_sa": "379924935547-compute@developer.gserviceaccount.com",
+  "dataflow_sa_roles": [
+    "roles/aiplatform.user",
+    "roles/alloydb.client",
+    "roles/artifactregistry.admin",
+    "roles/artifactregistry.reader",
+    "roles/artifactregistry.repoAdmin",
+    "roles/artifactregistry.writer",
+    "roles/cloudsql.admin",
+    "roles/compute.admin",
+    "roles/container.defaultNodeServiceAccount",
+    "roles/dataflow.admin",
+    "roles/dataflow.developer",
+    "roles/dataflow.worker",
+    "roles/dataplex.admin",
+    "roles/dataplex.catalogViewer",
+    "roles/geminidataanalytics.dataAgentOwner",
+    "roles/geminidataanalytics.dataAgentUser",
+    "roles/geminidataanalytics.queryDataUser",
+    "roles/iam.serviceAccountAdmin",
+    "roles/iam.serviceAccountTokenCreator",
+    "roles/iam.serviceAccountUser",
+    "roles/pubsub.subscriber",
+    "roles/spanner.admin",
+    "roles/spanner.databaseAdmin",
+    "roles/spanner.databaseUser",
+    "roles/storage.admin",
+    "roles/storage.folderAdmin"
+  ],
+  "instance_created": "reused-same-run-id",
+  "teardown": {
+    "instance": "deleted",
+    "gcs": "deleted",
+    "gcs_leftovers": []
+  }
+}

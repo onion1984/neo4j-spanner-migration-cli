@@ -227,6 +227,11 @@ neo4j-spanner-export export \
 
 Use `--overwrite` if writing into an existing non-empty `--output-dir`.
 
+- **About `--emit-unescape` (opt-in fallback, default `false`):** During export, `\` (`\\`), LF (`\n`), and CR (`\r`) are escaped so every CSV row stays on a single physical line. Dataflow's `GCS_Text_to_Cloud_Spanner` template (invoked with `escape=\`) decodes those sequences natively on load. Only pass `--emit-unescape` if you use an alternate loader that leaves literal `\n`, `\r`, or `\\` sequences in Spanner and need `schema/03_unescape.sql` (Partitioned DML `UPDATE` on non-PK `STRING(MAX)` columns) to decode them post-load.
+
+> [!CAUTION]
+> **Do not enable `--emit-unescape` with the standard `GCS_Text_to_Cloud_Spanner` (`escape=\`) Dataflow load:** because Dataflow already unescapes once on load, running `03_unescape.sql` afterward will **double-unescape** strings that legitimately contained literal `\n`, `\r`, or `\\`.
+
 This generates `./export_out/`:
 
 ```text

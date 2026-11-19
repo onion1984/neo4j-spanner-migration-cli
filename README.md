@@ -41,6 +41,33 @@ Because Neo4j is schema-optional and polymorphic while Spanner Graph is strongly
 
 ---
 
+## How the CLI Works
+
+`neo4j-spanner-export` separates migration into **three decoupled, resumable subcommands** connected by a declarative `schema_mapping.yaml` contract:
+
+```text
+Neo4j (4.4 / 5.x)
+   │
+   ├─► 1. discover ──► schema_mapping.yaml + discovery_report.md
+   │                        ▲ (edit & re-run discover to validate)
+   │
+   ├─► 2. export   ──► export_out/ (nodes/*.csv, edges/*.csv, manifests/*.json,
+   │                                schema/01..05*.sql, load_runbook.sh)
+   │                        │
+   │                        ▼
+   │                   load_runbook.sh (gcloud + Dataflow GCS_Text_to_Cloud_Spanner)
+   │                        │
+   │                        ▼
+   └─► 3. verify   ◄── Cloud Spanner (counts, sampled rows, Cypher ↔ GQL queries)
+```
+
+1. **`discover` (Read-only Neo4j probe):** Connects to Neo4j over Bolt, inspects version/edition and constraints, scans node label-sets and edge triplets, infers Spanner column types, and writes `schema_mapping.yaml` and `discovery_report.md`. Manual adjustments (`label_priority`, `pk_overrides`, `table_renames`, `column_renames`, property `override`s) live in `schema_mapping.yaml` and are re-validated whenever you re-run `discover`.
+2. **`export` (Local extraction & artifact generation):** Reads the validated `schema_mapping.yaml` (without re-inferring schema), streams Neo4j nodes and edge triplets in parallel workers into sharded headerless CSVs (`nodes/`, `edges/`), and emits Dataflow import manifests (`manifests/`), staged Spanner DDL/PDML scripts (`schema/01`–`05`), and `load_runbook.sh`. It does **not** touch GCP directly.
+3. **`load_runbook.sh` (GCP execution):** Runs outside the Python CLI using `gcloud` to create the Spanner database (`01_create_tables.sql`), upload CSVs/manifests to GCS, launch and monitor the Dataflow `GCS_Text_to_Cloud_Spanner` jobs (nodes first, then edges), convert staged `__json` arrays to `ARRAY<T>` and restore empty `BYTES` (`02_*`), apply destination FKs/indexes (`04_*`), and create the Spanner Property Graph (`05_property_graph.sql`).
+4. **`verify` (Dual-database parity check):** Connects to both Neo4j and Cloud Spanner to verify exact table/triplet row counts, randomly sampled row properties and `secondary_labels`, and paired Cypher ↔ GQL equivalence queries.
+
+---
+
 ## Key Features
 
 - **Cross-version Neo4j support (4.4 LTS & 5.x):** Probes `dbms.components()`, normalizes `SHOW CONSTRAINTS` (`UNIQUENESS`, `NODE_PROPERTY_UNIQUENESS`, `NODE_KEY`), and uses compatible Cypher dialects (`elementId()` vs `id()`).

@@ -93,7 +93,10 @@ neo4j-spanner-export discover \
 ```
 
 - Use `--sample-size N` only for fast dry-run previews; always run a full scan (omit `--sample-size`) before production export so no rare property types or parallel edges are missed.
-- Use `--label-priority LabelA,LabelB` to resolve multi-label nodes from the CLI, or edit `schema_mapping.yaml` directly (`label_priority`, `pk_overrides`, `table_renames`, `column_renames`, property `override`s) and re-run `discover` (if `--output-mapping` already exists, it is automatically reused as `--input-mapping` unless `--input-mapping` is set explicitly).
+- Use `--label-priority LabelA,LabelB` to resolve multi-label nodes from the CLI, or edit `schema_mapping.yaml` directly (`label_priority`, `pk_overrides`, `table_renames`, `column_renames`, property `override`s).
+
+> [!IMPORTANT]
+> **Always re-run `discover` after editing `schema_mapping.yaml`** to validate your overrides/renames (such as `pk_overrides`, `label_priority`, `table_renames`, `column_renames`, and property `override`s) and refresh `discovery_report.md` before proceeding to `export`. If `--output-mapping` already exists, `discover` automatically reuses it as `--input-mapping` (or pass `--input-mapping schema_mapping.yaml` explicitly).
 
 #### Sample `schema_mapping.yaml` (with inline explanations)
 

@@ -1,6 +1,0 @@
-":START_ID",":END_ID",":TYPE","imported_at:datetime","importBatch","importedAt:datetime","reviewed_by","reviewed_at:datetime","source","review_status","sourceType","importVersion"
-"11","12","CHILD_OF","2026-01-16T00:11Z","sample_value_1","2026-01-05T08:18:20.544Z","John Sample","2026-08-18T02:02:03.211Z","leanix","AUTO_TRUST","displayName-parsing","1.0"
-"27","33","CHILD_OF","2026-04-09T22:16Z","sample_value_2","2026-01-30T09:09:13.628Z","Alex Demo","2026-05-05T10:43:56.756Z","leanix-displayname","IMPORTED","displayName-parsing","1.0"
-"18","19","CHILD_OF","2026-10-24T15:39Z","sample_value_3","2026-08-20T02:15:16.789Z","Sam Placeholder","2026-06-24T23:44:15.475Z","leanix","AUTO_TRUST","displayName-parsing","1.0"
-"14","15","CHILD_OF","2026-09-09T14:53Z","sample_value_4","2026-07-06T00:00:35.891Z","Kim Example","2026-03-29T22:43:00.672Z","leanix-displayname","IMPORTED","displayName-parsing","1.0"
-"30","31","CHILD_OF","2026-06-13T08:45Z","sample_value_5","2026-08-23T14:23:01.918Z","Pat Sample","2026-09-25T09:54:23.366Z","leanix","AUTO_TRUST","displayName-parsing","1.0"

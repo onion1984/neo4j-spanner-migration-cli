@@ -1,6 +1,0 @@
-":START_ID",":END_ID",":TYPE","reviewed_at:datetime","reviewed_by","imported_at:datetime","migrated_from","review_status","environment","migrated_at:datetime"
-"1","317","INSTALLED_ON","2026-05-04T01:45:51.064Z","John Sample","2026-09-25T05:53:19.994Z","sample_value_1","sample_value_1","sample_value_1","2026-09-11T08:53:15.897Z"
-"2","318","INSTALLED_ON","2026-07-09T00:06:22.489Z","Alex Demo","2026-03-13T02:03:13.467Z","sample_value_2","sample_value_2","sample_value_2","2026-09-06T07:41:50.721Z"
-"3","319","INSTALLED_ON","2026-01-04T05:46:30.087Z","Sam Placeholder","2026-04-01T02:21:43.211Z","sample_value_3","sample_value_3","sample_value_3","2026-01-07T16:31:54.351Z"
-"4","320","INSTALLED_ON","2026-05-24T14:38:06.591Z","Kim Example","2026-08-05T04:02:13.521Z","sample_value_4","sample_value_4","sample_value_4","2026-05-28T11:48:00.871Z"
-"5","316","INSTALLED_ON","2026-10-27T10:57:10.764Z","Pat Sample","2026-10-02T14:06:41.029Z","sample_value_5","sample_value_5","sample_value_5","2026-06-20T11:48:28.879Z"

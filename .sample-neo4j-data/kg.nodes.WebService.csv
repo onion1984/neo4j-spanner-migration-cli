@@ -1,6 +1,0 @@
-":ID","updatedAt:datetime","reviewed_at:datetime","snow_sys_id","review_status","reviewed_by","importBatch","name","sys_class_name","source",":LABEL"
-"341","2026-05-17T18:47:30.664Z","2026-03-31T05:06:27.364Z","808m4jyx512p57oau992v0y9t5694n0l","AUTO_TRUST","John Sample","Example value 1","Example WebService Beta 1","Example WebService Beta 1","[""sample_value_1""]","WebService"
-"342","2026-08-24T05:03:08.687Z","2026-06-27T05:41:09.815Z","64837301ivz3355858e63j8x05695615","AUTO_TRUST","Alex Demo","Example value 2","Example WebService Gamma 2","Example WebService Gamma 2","[""sample_value_2""]","WebService"
-"343","2026-08-19T10:08:56.255Z","2026-04-11T07:07:00.241Z","77736q9120650t29h3b0vscn083v0318","AUTO_TRUST","Sam Placeholder","Example value 3","Example WebService Delta 3","Example WebService Delta 3","[""sample_value_3""]","WebService"
-"344","2026-08-10T18:25:43.817Z","2026-10-26T05:49:37.740Z","220blo9y8h7a5k55ik92l13cka0285v8","AUTO_TRUST","Kim Example","Example value 4","Example WebService Omega 4","Example WebService Omega 4","[""sample_value_4""]","WebService"
-"345","2026-03-15T02:29:57.053Z","2026-09-01T23:16:47.191Z","91901b100r2w5x05q42e1485j7y2sg84","AUTO_TRUST","Pat Sample","Example value 5","Example WebService Nova 5","Example WebService Nova 5","[""sample_value_5""]","WebService"

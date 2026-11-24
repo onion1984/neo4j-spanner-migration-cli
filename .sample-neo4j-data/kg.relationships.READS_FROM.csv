@@ -1,6 +1,0 @@
-":START_ID",":END_ID",":TYPE","imported_at:datetime","reviewed_at:datetime","reviewed_by","source","review_status"
-"91","202","READS_FROM","2026-10-26T19:16Z","2026-07-21T05:48:32.483Z","John Sample","sample_value_1","sample_value_1"
-"92","203","READS_FROM","2026-04-11T15:57Z","2026-08-05T04:27:49.759Z","Alex Demo","sample_value_2","sample_value_2"
-"93","204","READS_FROM","2026-06-30T00:42Z","2026-03-05T14:16:49.888Z","Sam Placeholder","sample_value_3","sample_value_3"
-"94","205","READS_FROM","2026-06-16T10:55Z","2026-09-15T05:01:55.971Z","Kim Example","sample_value_4","sample_value_4"
-"95","201","READS_FROM","2026-07-03T15:59Z","2026-07-04T00:47:31.355Z","Pat Sample","sample_value_5","sample_value_5"

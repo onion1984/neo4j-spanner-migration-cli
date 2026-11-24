@@ -1,6 +1,0 @@
-":START_ID",":END_ID",":TYPE","source","createdAt","imported_at:datetime","reviewed_at:datetime","review_status","reviewed_by"
-"326","57","DEFINES_CLASS","path-matching","Example value 1","2026-09-14T09:46Z","2026-07-13T04:08:28.215Z","IMPORTED","John Sample"
-"327","53","DEFINES_CLASS","path-matching-exact","Example value 2","2026-06-05T22:37Z","2026-01-07T12:12:40.111Z","IMPORTED","Alex Demo"
-"328","49","DEFINES_CLASS","path-matching-suffix","Example value 3","2026-06-02T00:12Z","2026-08-08T18:19:55.501Z","IMPORTED","Sam Placeholder"
-"329","60","DEFINES_CLASS","path-matching","Example value 4","2026-09-05T04:25Z","2026-09-27T19:32:03.959Z","IMPORTED","Kim Example"
-"330","51","DEFINES_CLASS","path-matching-exact","Example value 5","2026-05-19T17:14Z","2026-03-05T20:22:06.625Z","IMPORTED","Pat Sample"

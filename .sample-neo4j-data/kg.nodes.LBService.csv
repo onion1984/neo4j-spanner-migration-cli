@@ -1,6 +1,0 @@
-":ID","updatedAt:datetime","reviewed_at:datetime","snow_sys_id","source","review_status","reviewed_by","importBatch","sys_class_name","name",":LABEL"
-"221","2026-06-09T08:11:41.955Z","2026-04-03T17:13:38.177Z","0607v78r135c0z18t411369et8228q06","[""sample_value_1""]","AUTO_TRUST","John Sample","Example value 1","Example LBService Beta 1","src/example/module1/Sample1","LBService"
-"222","2026-06-08T08:57:48.181Z","2026-04-08T08:45:33.543Z","49709o87qk865839i1m48j1c3w182856","[""sample_value_2""]","AUTO_TRUST","Alex Demo","Example value 2","Example LBService Gamma 2","src/example/module2/Sample2","LBService"
-"223","2026-09-13T01:33:21.169Z","2026-04-18T22:31:37.475Z","71va4645w09c5m49zl08lpziu6s88t33","[""sample_value_3""]","AUTO_TRUST","Sam Placeholder","Example value 3","Example LBService Delta 3","src/example/module3/Sample3","LBService"
-"224","2026-01-13T17:47:13.838Z","2026-04-23T10:09:19.983Z","360dj19x365pic177510a4ny6flqi9j3","[""sample_value_4""]","AUTO_TRUST","Kim Example","Example value 4","Example LBService Omega 4","src/example/module4/Sample4","LBService"
-"225","2026-05-22T13:57:30.740Z","2026-09-29T21:09:08.827Z","28918u832409855374u175243jt52p61","[""sample_value_5""]","AUTO_TRUST","Pat Sample","Example value 5","Example LBService Nova 5","src/example/module5/Sample5","LBService"

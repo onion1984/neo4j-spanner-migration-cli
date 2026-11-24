@@ -1,6 +1,0 @@
-":START_ID",":END_ID",":TYPE","imported_at:datetime","derived_from","reviewed_at:datetime","source","review_status","created_at:datetime","reviewed_by","importBatch"
-"21","22","NEXT","2026-10-26T06:26Z","DECOMPOSES_INTO_ordering","2026-01-06T16:19:15.238Z","derived","AUTO_TRUST","2026-06-20T03:40:39.298Z","John Sample","Example value 1"
-"37","38","NEXT","2026-06-11T01:54Z","DECOMPOSES_INTO_ordering","2026-07-11T18:39:53.104Z","fs-code","IMPORTED","2026-04-20T04:44:47.495Z","Alex Demo","Example value 2"
-"23","24","NEXT","2026-09-24T13:23Z","DECOMPOSES_INTO_ordering","2026-06-25T17:07:30.532Z","fs_staging","NEEDS_REVIEW","2026-01-06T03:10:27.520Z","Sam Placeholder","Example value 3"
-"39","40","NEXT","2026-02-09T10:05Z","DECOMPOSES_INTO_ordering","2026-07-19T11:08:10.496Z","derived","AUTO_TRUST","2026-04-29T23:12:19.889Z","Kim Example","Example value 4"
-"25","21","NEXT","2026-09-09T02:37Z","DECOMPOSES_INTO_ordering","2026-10-22T18:52:41.837Z","fs-code","IMPORTED","2026-05-09T04:28:44.432Z","Pat Sample","Example value 5"

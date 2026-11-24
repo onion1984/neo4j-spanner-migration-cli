@@ -1,6 +1,0 @@
-":START_ID",":END_ID",":TYPE","importBatch","importedAt:datetime","reviewed_by","reviewed_at:datetime","source","review_status","imported_at:datetime"
-"216","177","TRANSFERS","full-catalog","2026-09-16T01:46:49.592Z","John Sample","2026-04-18T10:56:04.078Z","leanix","AUTO_TRUST","2026-07-29T01:57Z"
-"217","193","TRANSFERS","full-catalog","2026-10-02T14:05:19.431Z","Alex Demo","2026-06-26T16:31:46.310Z","leanix","IMPORTED","2026-06-29T02:33Z"
-"218","179","TRANSFERS","full-catalog","2026-01-14T22:19:12.546Z","Sam Placeholder","2026-07-24T12:49:32.623Z","leanix","AUTO_TRUST","2026-03-31T10:44Z"
-"219","195","TRANSFERS","full-catalog","2026-05-27T01:37:07.875Z","Kim Example","2026-02-01T07:07:41.969Z","leanix","IMPORTED","2026-10-26T20:22Z"
-"220","176","TRANSFERS","full-catalog","2026-10-04T09:04:07.554Z","Pat Sample","2026-04-05T09:25:38.249Z","leanix","AUTO_TRUST","2026-05-03T13:59Z"

@@ -1,6 +1,0 @@
-":START_ID",":END_ID",":TYPE","importBatch","imported_at:datetime","reviewed_at:datetime","reviewed_by","updatedAt:datetime","source","review_status"
-"251","317","CONNECTED_TO","Example value 1","2026-02-15T20:17Z","2026-02-13T12:43:45.133Z","John Sample","2026-05-13T15:11:21.341Z","snow","AUTO_TRUST"
-"252","253","CONNECTED_TO","Example value 2","2026-01-11T06:15Z","2026-09-01T04:42:43.497Z","Alex Demo","2026-04-13T01:27:26.051Z","snow","AUTO_TRUST"
-"253","319","CONNECTED_TO","Example value 3","2026-04-08T07:22Z","2026-08-04T22:36:58.988Z","Sam Placeholder","2026-01-09T12:18:13.093Z","snow","AUTO_TRUST"
-"254","255","CONNECTED_TO","Example value 4","2026-10-14T14:17Z","2026-06-26T17:16:00.631Z","Kim Example","2026-02-22T18:38:40.427Z","snow","AUTO_TRUST"
-"255","316","CONNECTED_TO","Example value 5","2026-02-09T23:44Z","2026-09-08T05:34:59.904Z","Pat Sample","2026-08-05T12:46:43.939Z","snow","AUTO_TRUST"

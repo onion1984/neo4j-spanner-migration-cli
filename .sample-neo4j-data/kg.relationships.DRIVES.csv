@@ -1,6 +1,0 @@
-":START_ID",":END_ID",":TYPE","imported_at:datetime","importBatch","importedAt:datetime","sourceType","reviewed_at:datetime","review_status","importVersion","source","reviewed_by"
-"26","32","DRIVES","2026-10-16T01:50Z","full-catalog","2026-08-26T11:19:30.132Z","displayName-parsing","2026-05-30T05:27:34.178Z","AUTO_TRUST","1.0","leanix-displayname","John Sample"
-"32","28","DRIVES","2026-08-08T18:11Z","full-catalog","2026-05-18T21:41:40.140Z","displayName-parsing","2026-10-01T14:36:17.611Z","IMPORTED","1.0","leanix-displayname","Alex Demo"
-"28","34","DRIVES","2026-08-17T10:57Z","full-catalog","2026-08-27T16:15:17.173Z","displayName-parsing","2026-01-17T18:09:00.972Z","AUTO_TRUST","1.0","leanix-displayname","Sam Placeholder"
-"34","30","DRIVES","2026-09-25T12:16Z","full-catalog","2026-04-01T05:38:42.421Z","displayName-parsing","2026-03-17T04:59:47.522Z","IMPORTED","1.0","leanix-displayname","Kim Example"
-"30","31","DRIVES","2026-03-30T18:09Z","full-catalog","2026-10-23T12:31:46.232Z","displayName-parsing","2026-01-30T04:32:25.167Z","AUTO_TRUST","1.0","leanix-displayname","Pat Sample"

@@ -1,6 +1,0 @@
-":START_ID",":END_ID",":TYPE","imported_at:datetime","reviewed_at:datetime","review_status","reviewed_by","message","importedAt","source","sourceFile"
-"271","7","USES_SERVICE","2026-03-03T12:56Z","2026-01-15T06:11:45.213Z","sample_value_1","John Sample","Example text for USES_SERVICE 1, for illustration only.","2026-02-19T06:15:31.433196","sample_value_1","src/example/module1/Sample1.md"
-"272","8","USES_SERVICE","2026-02-06T02:45Z","2026-07-23T13:56:02.028Z","sample_value_2","Alex Demo","Example text for USES_SERVICE 2, for illustration only.","2026-07-04T23:55:59.197763","sample_value_2","src/example/module2/Sample2.md"
-"273","9","USES_SERVICE","2026-07-24T20:01Z","2026-09-17T14:24:00.794Z","sample_value_3","Sam Placeholder","Example text for USES_SERVICE 3, for illustration only.","2026-05-04T12:32:17.571104","sample_value_3","src/example/module3/Sample3.md"
-"274","10","USES_SERVICE","2026-10-10T16:47Z","2026-07-04T20:26:12.267Z","sample_value_4","Kim Example","Example text for USES_SERVICE 4, for illustration only.","2026-01-04T15:03:21.940764","sample_value_4","src/example/module4/Sample4.md"
-"275","6","USES_SERVICE","2026-06-29T19:35Z","2026-06-16T10:00:36.302Z","sample_value_5","Pat Sample","Example text for USES_SERVICE 5, for illustration only.","2026-06-21T17:26:30.352275","sample_value_5","src/example/module5/Sample5.md"

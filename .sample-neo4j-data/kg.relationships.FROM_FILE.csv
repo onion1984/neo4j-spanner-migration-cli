@@ -1,6 +1,0 @@
-":START_ID",":END_ID",":TYPE","source","createdAt"
-"56","327","FROM_FILE","kscm","Example value 1"
-"52","328","FROM_FILE","path-matching","Example value 2"
-"293","329","FROM_FILE","path-matching-exact","Example value 3"
-"59","330","FROM_FILE","path-matching-suffix","Example value 4"
-"55","326","FROM_FILE","kscm","Example value 5"

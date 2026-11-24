@@ -1,6 +1,0 @@
-":START_ID",":END_ID",":TYPE","imported_at:datetime","reviewed_at:datetime","review_status","reviewed_by","repo","source","createdAt"
-"326","337","IMPLEMENTED_IN","2026-06-24T14:18Z","2026-07-10T07:52:00.401Z","IMPORTED","John Sample","sample_value_1","derived-from-repo","Example value 1"
-"87","338","IMPLEMENTED_IN","2026-07-09T02:34Z","2026-10-12T19:32:35.497Z","IMPORTED","Alex Demo","sample_value_2","file-language","Example value 2"
-"113","339","IMPLEMENTED_IN","2026-06-26T10:04Z","2026-08-06T05:08:46.527Z","IMPORTED","Sam Placeholder","sample_value_3","derived-from-repo","Example value 3"
-"329","340","IMPLEMENTED_IN","2026-10-05T02:43Z","2026-04-24T11:04:46.623Z","IMPORTED","Kim Example","sample_value_4","file-language","Example value 4"
-"90","336","IMPLEMENTED_IN","2026-01-29T11:04Z","2026-02-24T17:47:49.952Z","IMPORTED","Pat Sample","sample_value_5","derived-from-repo","Example value 5"

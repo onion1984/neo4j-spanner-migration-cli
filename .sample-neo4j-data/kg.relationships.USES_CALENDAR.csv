@@ -1,6 +1,0 @@
-":START_ID",":END_ID",":TYPE","importBatch","created_at:datetime","source"
-"171","157","USES_CALENDAR","sample_value_1","2026-02-12T00:52:31.149Z","ctm"
-"172","158","USES_CALENDAR","sample_value_2","2026-09-29T04:06:43.161Z","ctm"
-"173","159","USES_CALENDAR","sample_value_3","2026-08-16T13:42:36.159Z","ctm"
-"174","160","USES_CALENDAR","sample_value_4","2026-01-05T00:55:16.185Z","ctm"
-"175","156","USES_CALENDAR","sample_value_5","2026-01-25T19:30:43.146Z","ctm"

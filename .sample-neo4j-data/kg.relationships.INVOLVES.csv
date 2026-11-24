@@ -1,6 +1,0 @@
-":START_ID",":END_ID",":TYPE","importBatch","match_type","confidence:double","reviewed_by","reviewed_at:datetime","source","review_status"
-"21","92","INVOLVES","Example value 1","sample_value_1","0.45","John Sample","2026-03-25T10:58:03.274Z","sample_value_1","IMPORTED"
-"22","88","INVOLVES","Example value 2","sample_value_2","0.42","Alex Demo","2026-01-28T13:34:14.182Z","sample_value_2","NEEDS_REVIEW"
-"23","99","INVOLVES","Example value 3","sample_value_3","0.22","Sam Placeholder","2026-05-02T22:08:27.597Z","sample_value_3","IMPORTED"
-"24","95","INVOLVES","Example value 4","sample_value_4","0.72","Kim Example","2026-10-26T04:02:46.847Z","sample_value_4","NEEDS_REVIEW"
-"25","86","INVOLVES","Example value 5","sample_value_5","0.87","Pat Sample","2026-03-01T22:49:34.711Z","sample_value_5","IMPORTED"

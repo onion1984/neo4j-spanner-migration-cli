@@ -1,6 +1,0 @@
-":START_ID",":END_ID",":TYPE","imported_at:datetime","reviewed_at:datetime","review_status","reviewed_by","importedAt:datetime","source","importBatch","source_branch","source_file","updatedAt:datetime","source_line:long"
-"1","217","CONSUMES","2026-06-13T20:52Z","2026-04-01T20:35:25.939Z","AUTO_TRUST","John Sample","2026-08-06T12:32:51.528Z","kscm","full-catalog","sample_value_1","src/example/module1/Sample1.go","2026-02-20T12:58:48.195Z","48"
-"127","243","CONSUMES","2026-08-28T07:04Z","2026-06-12T20:28:45.104Z","IMPORTED","Alex Demo","2026-06-25T18:31:01.794Z","leanix","full-catalog","sample_value_2","src/example/module2/Sample2.go","2026-01-22T12:53:16.848Z","99"
-"88","244","CONSUMES","2026-09-11T14:37Z","2026-02-24T17:13:01.505Z","AUTO_TRUST","Sam Placeholder","2026-01-28T16:17:08.782Z","kscm","full-catalog","sample_value_3","src/example/module3/Sample3.go","2026-05-02T03:31:37.399Z","76"
-"4","220","CONSUMES","2026-01-05T20:29Z","2026-01-03T13:16:50.072Z","IMPORTED","Kim Example","2026-03-08T23:01:45.397Z","leanix","full-catalog","sample_value_4","src/example/module4/Sample4.go","2026-04-15T12:41:18.032Z","65"
-"130","241","CONSUMES","2026-05-01T05:02Z","2026-08-20T23:01:09.426Z","AUTO_TRUST","Pat Sample","2026-10-23T16:08:40.291Z","kscm","full-catalog","sample_value_5","src/example/module5/Sample5.go","2026-05-13T14:26:11.016Z","66"

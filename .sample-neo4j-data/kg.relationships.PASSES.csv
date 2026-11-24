@@ -1,6 +1,0 @@
-":START_ID",":END_ID",":TYPE","imported_at:datetime","reviewed_at:datetime","review_status","reviewed_by","mapping_type","migratedFrom","source","data_domain","derivedFrom"
-"206","232","PASSES","2026-10-21T22:41Z","2026-04-16T14:07:15.907Z","IMPORTED","John Sample","sample_value_1","sample_value_1","d3-eacm_analysis","sample_value_1","Component.EXPOSES+USES"
-"207","233","PASSES","2026-03-01T14:49Z","2026-02-28T12:24:40.768Z","NEEDS_REVIEW","Alex Demo","sample_value_2","sample_value_2","derived","sample_value_2","Component.EXPOSES+USES"
-"208","234","PASSES","2026-07-15T16:51Z","2026-06-28T02:15:12.047Z","IMPORTED","Sam Placeholder","sample_value_3","sample_value_3","d3-eacm_analysis","sample_value_3","Component.EXPOSES+USES"
-"209","235","PASSES","2026-10-05T20:25Z","2026-10-11T00:43:53.822Z","NEEDS_REVIEW","Kim Example","sample_value_4","sample_value_4","derived","sample_value_4","Component.EXPOSES+USES"
-"210","231","PASSES","2026-07-18T23:01Z","2026-09-09T16:41:29.937Z","IMPORTED","Pat Sample","sample_value_5","sample_value_5","d3-eacm_analysis","sample_value_5","Component.EXPOSES+USES"

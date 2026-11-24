@@ -1,6 +1,0 @@
-":START_ID",":END_ID",":TYPE","file_path"
-"56","112","ALSO_IN_COMPONENT","src/example/module1/Sample1.java"
-"52","128","ALSO_IN_COMPONENT","src/example/module2/Sample2.java"
-"58","129","ALSO_IN_COMPONENT","src/example/module3/Sample3.java"
-"59","115","ALSO_IN_COMPONENT","src/example/module4/Sample4.java"
-"55","126","ALSO_IN_COMPONENT","src/example/module5/Sample5.java"

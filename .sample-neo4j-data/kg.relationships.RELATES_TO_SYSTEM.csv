@@ -1,0 +1,6 @@
+":START_ID",":END_ID",":TYPE","imported_at:datetime","reviewed_at:datetime","review_status","reviewed_by","syncedAt:datetime","mode","description"
+"201","202","RELATES_TO_SYSTEM","2026-02-03T11:10Z","2026-04-12T06:34:15.370Z","sample_value_1","John Sample","2026-05-03T16:13:57.713Z","sample_value_1","Example text for RELATES_TO_SYSTEM 1, for illustration only."
+"202","203","RELATES_TO_SYSTEM","2026-08-14T19:10Z","2026-04-08T13:07:27.333Z","sample_value_2","Alex Demo","2026-06-29T12:32:54.802Z","sample_value_2","Example text for RELATES_TO_SYSTEM 2, for illustration only."
+"203","204","RELATES_TO_SYSTEM","2026-08-23T07:56Z","2026-06-09T03:49:28.311Z","sample_value_3","Sam Placeholder","2026-01-28T12:32:16.202Z","sample_value_3","Example text for RELATES_TO_SYSTEM 3, for illustration only."
+"204","205","RELATES_TO_SYSTEM","2026-09-30T04:04Z","2026-07-17T11:01:55.589Z","sample_value_4","Kim Example","2026-07-22T05:13:24.508Z","sample_value_4","Example text for RELATES_TO_SYSTEM 4, for illustration only."
+"205","201","RELATES_TO_SYSTEM","2026-05-30T21:00Z","2026-07-20T22:38:32.651Z","sample_value_5","Pat Sample","2026-09-15T03:36:52.316Z","sample_value_5","Example text for RELATES_TO_SYSTEM 5, for illustration only."

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from .config import EdgeTripletMapping, NodeTableMapping
+from .config import EdgeTripletMapping, NodeTableMapping, resolve_effective_type
 from .naming import derive_prefixed_identifier
 from .types import (
     is_array_type,
@@ -30,14 +30,19 @@ class ColumnSpec:
     source_raw_name: str = ""  # For src_pk / dst_pk: the node's raw PK property name
 
 
-def get_node_columns(nm: NodeTableMapping) -> list[ColumnSpec]:
+def get_node_columns(
+    nm: NodeTableMapping,
+    property_type_overrides: dict[str, str] | None = None,
+) -> list[ColumnSpec]:
     """Return the ordered list of ColumnSpecs for a node table."""
     cols: list[ColumnSpec] = []
     pk_set = set(nm.pk_columns)
 
     for pk_raw in nm.pk_columns:
         pm = nm.properties[pk_raw]
-        eff = pm.effective_type
+        eff = resolve_effective_type(
+            pm, property_type_overrides, prop_alias=nm.column_renames.get(pk_raw, pk_raw)
+        )
         cols.append(
             ColumnSpec(
                 raw_name=pk_raw,
@@ -57,7 +62,9 @@ def get_node_columns(nm: NodeTableMapping) -> list[ColumnSpec]:
         if raw_name in pk_set:
             continue
         pm = nm.properties[raw_name]
-        eff = pm.effective_type
+        eff = resolve_effective_type(
+            pm, property_type_overrides, prop_alias=nm.column_renames.get(raw_name, raw_name)
+        )
         role = "secondary_labels" if raw_name == "secondary_labels" else "prop"
         cols.append(
             ColumnSpec(
@@ -80,13 +87,16 @@ def get_edge_columns(
     em: EdgeTripletMapping,
     src_node: NodeTableMapping,
     dst_node: NodeTableMapping,
+    property_type_overrides: dict[str, str] | None = None,
 ) -> list[ColumnSpec]:
     """Return the ordered list of ColumnSpecs for an edge triplet table."""
     cols: list[ColumnSpec] = []
 
     for pk_raw in src_node.pk_columns:
         pm = src_node.properties[pk_raw]
-        eff = pm.effective_type
+        eff = resolve_effective_type(
+            pm, property_type_overrides, prop_alias=src_node.column_renames.get(pk_raw, pk_raw)
+        )
         cols.append(
             ColumnSpec(
                 raw_name=pm.spanner_column,
@@ -104,7 +114,9 @@ def get_edge_columns(
 
     for pk_raw in dst_node.pk_columns:
         pm = dst_node.properties[pk_raw]
-        eff = pm.effective_type
+        eff = resolve_effective_type(
+            pm, property_type_overrides, prop_alias=dst_node.column_renames.get(pk_raw, pk_raw)
+        )
         dst_col = derive_prefixed_identifier("dst_", pm.spanner_column)
         cols.append(
             ColumnSpec(
@@ -139,7 +151,9 @@ def get_edge_columns(
 
     for raw_name in sorted(em.properties):
         pm = em.properties[raw_name]
-        eff = pm.effective_type
+        eff = resolve_effective_type(
+            pm, property_type_overrides, prop_alias=em.column_renames.get(raw_name, raw_name)
+        )
         cols.append(
             ColumnSpec(
                 raw_name=raw_name,

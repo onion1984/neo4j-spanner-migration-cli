@@ -1,0 +1,6 @@
+":START_ID",":END_ID",":TYPE","source_branch","source_file","updatedAt:datetime","reviewed_by","reviewed_at:datetime","source_line:long","source","review_status"
+"86","242","PRODUCES","sample_value_1","src/example/module1/Sample1.go","2026-02-15T08:08:58.656Z","John Sample","2026-10-08T02:25:22.075Z","81","sample_value_1","sample_value_1"
+"127","243","PRODUCES","sample_value_2","src/example/module2/Sample2.go","2026-03-01T23:33:22.555Z","Alex Demo","2026-09-08T19:55:34.412Z","26","sample_value_2","sample_value_2"
+"88","244","PRODUCES","sample_value_3","src/example/module3/Sample3.go","2026-10-26T09:17:50.769Z","Sam Placeholder","2026-07-08T15:15:07.016Z","78","sample_value_3","sample_value_3"
+"129","245","PRODUCES","sample_value_4","src/example/module4/Sample4.go","2026-10-21T02:37:10.198Z","Kim Example","2026-02-18T13:22:35.714Z","18","sample_value_4","sample_value_4"
+"90","241","PRODUCES","sample_value_5","src/example/module5/Sample5.go","2026-05-18T16:37:54.583Z","Pat Sample","2026-07-06T14:47:12.082Z","62","sample_value_5","sample_value_5"

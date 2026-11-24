@@ -1,0 +1,6 @@
+":START_ID",":END_ID",":TYPE","imported_at:datetime","reviewed_at:datetime","reviewed_by","source","review_status","created_at:datetime","migratedFrom","role","createdAt","original_path"
+"186","207","DEFINES","2026-05-30T13:25Z","2026-05-04T18:50:47.102Z","John Sample","derived","AUTO_TRUST","2026-03-23T08:45:27.808248Z","DEFINED_IN","primary","Example value 1","src/example/module1/Sample1.go"
+"187","213","DEFINES","2026-01-05T12:31Z","2026-07-24T16:38:48.294Z","Alex Demo","fs_staging","IMPORTED","2026-03-30T04:38:31.695300Z","DOCUMENTED_IN","secondary","Example value 2","src/example/module2/Sample2.go"
+"328","314","DEFINES","2026-03-06T19:54Z","2026-08-11T23:20:07.378Z","Sam Placeholder","path-matching-exact","NEEDS_REVIEW","2026-03-03T16:09:51.559063Z","DEFINED_IN","supporting","Example value 3","src/example/module3/Sample3.go"
+"189","210","DEFINES","2026-06-28T07:57Z","2026-05-28T20:33:53.170Z","Kim Example","path-matching-suffix","AUTO_TRUST","2026-01-05T09:01:43.256500Z","DOCUMENTED_IN","primary","Example value 4","src/example/module4/Sample4.go"
+"190","211","DEFINES","2026-05-25T19:37Z","2026-05-26T17:12:35.224Z","Pat Sample","derived","IMPORTED","2026-09-12T02:40:31.314409Z","DEFINED_IN","secondary","Example value 5","src/example/module5/Sample5.go"

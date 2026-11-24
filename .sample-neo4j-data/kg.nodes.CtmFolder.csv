@@ -1,0 +1,6 @@
+":ID","updated_at:datetime","last_upload","folder_kind","ctm_stale:boolean","imported_at:datetime","folder_name","source","review_status","platform","importBatch","datacenter","version","id","parent_folder",":LABEL"
+"161","2026-02-19T06:10:16.819Z","sample_value_1","Folder","false","2026-03-15T12:39:03.890Z","Example CtmFolder Beta 1","ctm","AUTO_TRUST","UNIX","sample_value_1","ctrlmprd","919","mwk","sample_value_1","CtmFolder"
+"162","2026-02-15T22:06:27.592Z","sample_value_2","SmartFolder","false","2026-05-10T23:43:02.155Z","Example CtmFolder Gamma 2","ctm","AUTO_TRUST","UNIX","sample_value_2","ctrlmprd","919","wxrrty","sample_value_2","CtmFolder"
+"163","2026-03-04T21:29:22.871Z","sample_value_3","Folder","false","2026-07-05T10:46:47.626Z","Example CtmFolder Delta 3","ctm","AUTO_TRUST","UNIX","sample_value_3","ctrlmprd","919","gqfblwg","sample_value_3","CtmFolder"
+"164","2026-10-27T03:58:52.438Z","sample_value_4","SmartFolder","false","2026-07-27T06:45:12.588Z","Example CtmFolder Omega 4","ctm","AUTO_TRUST","UNIX","sample_value_4","ctrlmprd","919","s_evzeh","sample_value_4","CtmFolder"
+"165","2026-03-11T15:26:59.674Z","sample_value_5","Folder","false","2026-07-20T15:37:25.309Z","Example CtmFolder Nova 5","ctm","AUTO_TRUST","UNIX","sample_value_5","ctrlmprd","919","r_udfka6","sample_value_5","CtmFolder"

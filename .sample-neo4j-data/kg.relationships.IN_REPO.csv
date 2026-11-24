@@ -1,0 +1,6 @@
+":START_ID",":END_ID",":TYPE","imported_at:datetime","reviewed_at:datetime","review_status","reviewed_by","source","createdAt","class_count:long"
+"326","287","IN_REPO","2026-01-10T10:31Z","2026-05-06T02:35:49.755Z","IMPORTED","John Sample","derived-from-class-bridge","Example value 1","163"
+"262","288","IN_REPO","2026-10-05T12:11Z","2026-02-16T09:05:20.987Z","IMPORTED","Alex Demo","derived-from-component","Example value 2","96"
+"88","289","IN_REPO","2026-10-14T16:27Z","2026-07-02T15:04:44.538Z","IMPORTED","Sam Placeholder","kscm","Example value 3","76"
+"329","290","IN_REPO","2026-03-29T16:26Z","2026-01-07T10:46:58.615Z","IMPORTED","Kim Example","derived-from-class-bridge","Example value 4","73"
+"265","286","IN_REPO","2026-01-06T22:44Z","2026-09-01T09:24:44.256Z","IMPORTED","Pat Sample","derived-from-component","Example value 5","88"

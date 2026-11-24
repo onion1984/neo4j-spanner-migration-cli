@@ -1,0 +1,6 @@
+":START_ID",":END_ID",":TYPE","importBatch","reviewed_by","reviewed_at:datetime","source","review_status","imported_at:datetime","migrated_at","previous_type","backfill"
+"16","22","DECOMPOSES_INTO","Example value 1","John Sample","2026-03-18T11:41:02.301Z","d3-sequence","IMPORTED","2026-03-30T20:10Z","2026-04-19T08:03:20.280734","sample_value_1","152-bp-create-fs-staging"
+"12","13","DECOMPOSES_INTO","Example value 2","Alex Demo","2026-08-22T14:15:55.915Z","fs","NEEDS_REVIEW","2026-02-07T13:54Z","2026-05-27T12:12:57.249222","sample_value_2","152-bp-link"
+"13","39","DECOMPOSES_INTO","Example value 3","Sam Placeholder","2026-04-27T07:10:38.287Z","fs-code","auto","2026-08-08T20:15Z","2026-06-13T05:23:40.949522","sample_value_3","152-bp-create-fs-staging"
+"19","25","DECOMPOSES_INTO","Example value 4","Kim Example","2026-04-12T16:28:37.200Z","fs_staging","IMPORTED","2026-06-22T23:53Z","2026-01-31T08:13:22.760903","sample_value_4","152-bp-link"
+"15","11","DECOMPOSES_INTO","Example value 5","Pat Sample","2026-03-06T06:14:08.250Z","d3-sequence","NEEDS_REVIEW","2026-09-17T10:49Z","2026-01-31T08:50:29.212254","sample_value_5","152-bp-create-fs-staging"

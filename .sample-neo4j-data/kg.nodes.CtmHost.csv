@@ -1,0 +1,6 @@
+":ID","imported_at:datetime","review_status","importBatch","appl_type_breakdown_json","source","nodeid","job_count:long","sample_jobs","ctm_stale:boolean","updated_at:datetime",":LABEL"
+"166","2026-09-11T09:25:30.977Z","AUTO_TRUST","sample_value_1","{""OS"": 40}","ctm","192.0.2.11","43","[""Example value 1"", ""Example value 2"", ""Example value 3""]","false","2026-01-11T15:40:33.159Z","CtmHost"
+"167","2026-07-28T23:08:46.606Z","AUTO_TRUST","sample_value_2","{""OS"": 91}","ctm","Z097389B","4","[""Example value 2"", ""Example value 3"", ""Example value 4""]","false","2026-02-14T10:16:33.199Z","CtmHost"
+"168","2026-01-04T16:53:01.946Z","AUTO_TRUST","sample_value_3","{""OS"": 67}","ctm","L643575R5","2","[""Example value 3"", ""Example value 4"", ""Example value 5""]","false","2026-10-17T21:11:28.994Z","CtmHost"
+"169","2026-10-21T21:40:33.642Z","AUTO_TRUST","sample_value_4","{""OS"": 32}","ctm","RIICPXY01","4","[""Example value 4"", ""Example value 5"", ""Example value 6""]","false","2026-06-30T22:17:38.079Z","CtmHost"
+"170","2026-07-08T23:40:27.650Z","AUTO_TRUST","sample_value_5","{""OS"": 31}","ctm","IBGINYCHQM","51","[""Example value 5"", ""Example value 6"", ""Example value 7""]","false","2026-04-28T06:40:20.159Z","CtmHost"

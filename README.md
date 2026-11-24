@@ -149,6 +149,11 @@ pk_overrides:
     - tenant_id
     - order_id
 
+# Align graph-wide property types across all node and edge tables (case-insensitive).
+# Per-table `override` still takes precedence over `property_type_overrides`.
+property_type_overrides:
+  updatedAt: STRING(MAX)
+
 nodes:
   Person:
     raw_label: Person

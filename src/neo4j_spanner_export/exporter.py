@@ -9,6 +9,7 @@ from pathlib import Path
 import shutil
 from typing import Any
 
+from .artifacts import validate_property_graph_schema
 from .compat import cypher_ident, id_expr, label_where_predicate
 from .config import EdgeTripletMapping, NodeTableMapping, SchemaMapping, validate_mapping
 from .layout import ColumnSpec, get_edge_columns, get_node_columns
@@ -47,8 +48,9 @@ def _export_node_table(
     output_dir: Path,
     serializer_cfg: SerializerConfig,
     chunk_rows: int,
+    property_type_overrides: dict[str, str] | None = None,
 ) -> WriteResult:
-    cols = get_node_columns(nm)
+    cols = get_node_columns(nm, property_type_overrides)
     col_names = [c.staging_column for c in cols]
     excl = label_where_predicate("n", nm.excluded_labels)
     where_sql = f"WHERE {excl} " if excl else ""
@@ -100,8 +102,9 @@ def _export_edge_table(
     output_dir: Path,
     serializer_cfg: SerializerConfig,
     chunk_rows: int,
+    property_type_overrides: dict[str, str] | None = None,
 ) -> WriteResult:
-    cols = get_edge_columns(em, src_node, dst_node)
+    cols = get_edge_columns(em, src_node, dst_node, property_type_overrides)
     col_names = [c.staging_column for c in cols]
 
     src_excl = label_where_predicate("a", src_node.excluded_labels)
@@ -200,6 +203,7 @@ def export_graph(
     if workers <= 0:
         raise ValueError(f"workers must be > 0, got {workers}")
     validate_mapping(mapping)
+    validate_property_graph_schema(mapping)
 
     artifact_subpaths = ("nodes", "edges", "manifests", "schema", "load_runbook.sh")
     existing_artifacts = [p for p in artifact_subpaths if (output_dir / p).exists()]
@@ -231,6 +235,7 @@ def export_graph(
                     output_dir,
                     serializer_cfg,
                     chunk_rows,
+                    mapping.property_type_overrides,
                 )
                 futures[fut] = ("node", key)
 
@@ -247,6 +252,7 @@ def export_graph(
                     output_dir,
                     serializer_cfg,
                     chunk_rows,
+                    mapping.property_type_overrides,
                 )
                 futures[fut] = ("edge", key)
 

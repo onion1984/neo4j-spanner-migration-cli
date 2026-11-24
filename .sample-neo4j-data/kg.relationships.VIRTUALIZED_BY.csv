@@ -1,0 +1,6 @@
+":START_ID",":END_ID",":TYPE","importBatch","imported_at:datetime","reviewed_at:datetime","reviewed_by","updatedAt:datetime","source","review_status"
+"316","317","VIRTUALIZED_BY","Example value 1","2026-09-11T15:43Z","2026-03-01T22:02:34.778Z","John Sample","2026-03-05T21:06:24.144Z","snow","AUTO_TRUST"
+"317","318","VIRTUALIZED_BY","Example value 2","2026-09-21T10:04Z","2026-03-21T09:26:21.648Z","Alex Demo","2026-09-17T13:05:58.412Z","snow","AUTO_TRUST"
+"318","319","VIRTUALIZED_BY","Example value 3","2026-08-19T00:56Z","2026-02-17T07:11:04.821Z","Sam Placeholder","2026-04-23T06:49:09.329Z","snow","AUTO_TRUST"
+"319","320","VIRTUALIZED_BY","Example value 4","2026-06-30T22:37Z","2026-04-23T19:39:58.220Z","Kim Example","2026-09-02T17:59:53.802Z","snow","AUTO_TRUST"
+"320","316","VIRTUALIZED_BY","Example value 5","2026-09-03T14:13Z","2026-09-07T08:24:27.209Z","Pat Sample","2026-01-25T22:22:25.065Z","snow","AUTO_TRUST"

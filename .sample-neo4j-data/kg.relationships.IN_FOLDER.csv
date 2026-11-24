@@ -1,0 +1,6 @@
+":START_ID",":END_ID",":TYPE","importBatch","created_at:datetime","source"
+"171","162","IN_FOLDER","sample_value_1","2026-07-28T22:19:44.710Z","ctm"
+"172","163","IN_FOLDER","sample_value_2","2026-09-23T16:08:14.276Z","ctm"
+"173","164","IN_FOLDER","sample_value_3","2026-03-15T14:40:05.884Z","ctm"
+"174","165","IN_FOLDER","sample_value_4","2026-10-21T08:07:27.418Z","ctm"
+"175","161","IN_FOLDER","sample_value_5","2026-01-05T08:54:28.354Z","ctm"

@@ -1,0 +1,6 @@
+":START_ID",":END_ID",":TYPE","importBatch","via_application","created_at:datetime","source"
+"171","2","SCHEDULED_FOR","sample_value_1","sample_value_1","2026-03-26T17:51:30.460Z","ctm"
+"172","3","SCHEDULED_FOR","sample_value_2","sample_value_2","2026-05-08T06:37:39.216Z","ctm"
+"173","4","SCHEDULED_FOR","sample_value_3","sample_value_3","2026-04-02T11:40:57.763Z","ctm"
+"174","5","SCHEDULED_FOR","sample_value_4","sample_value_4","2026-09-04T22:13:41.577Z","ctm"
+"175","1","SCHEDULED_FOR","sample_value_5","sample_value_5","2026-01-25T14:17:49.218Z","ctm"

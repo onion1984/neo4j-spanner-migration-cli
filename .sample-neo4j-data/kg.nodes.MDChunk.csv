@@ -1,0 +1,16 @@
+":ID","updatedAt:datetime","importBatch","heading_anchor","doc_path","start_line:long","id","text","createdAt:datetime","chunk_version:long","heading_path","natural_key","app_id","doc_type",":LABEL"
+"236","2026-09-29T22:22:03.372Z","Example value 1","Example value 1","Example value 1","2","44lut976978702p818x6b8vo81167754","## Example section 1
+
+This is sample documentation text for illustration only.","2026-06-19T11:59:01.708Z","2","Example text for MDChunk 1, for illustration only.","EX-00001","089","BRD","MDChunk"
+"237","2026-01-29T05:12:59.437Z","sample_value_2","sample_value_2","https://api.example.com/v1/sample-resource-2","32","9227lzg110094d8vly4e3m190k13902v","## Example section 2
+
+This is sample documentation text for illustration only.","2026-05-30T11:22:57.396Z","5","src/example/module2/Sample2","src/example/module2/Sample2","045","FS","MDChunk"
+"238","2026-01-17T12:01:14.456Z","sample_value_3","sample_value_3","https://api.example.com/v1/sample-resource-3","46","nin35oi9c960803z8s1t3g088406df17","## Example section 3
+
+This is sample documentation text for illustration only.","2026-06-23T08:32:28.820Z","9","src/example/module3/Sample3","src/example/module3/Sample3","428","snow_synthesized","MDChunk"
+"239","2026-05-09T02:07:52.786Z","sample_value_4","sample_value_4","https://api.example.com/v1/sample-resource-4","18","p7pii92fkv5q9835458v37u16j0z1g00","## Example section 4
+
+This is sample documentation text for illustration only.","2026-04-24T23:48:46.041Z","7","src/example/module4/Sample4","src/example/module4/Sample4","543","BRD","MDChunk"
+"240","2026-04-09T15:37:33.570Z","sample_value_5","sample_value_5","https://api.example.com/v1/sample-resource-5","5","504n1h0ed6n40f6nw09vp16d9s0rae3c","## Example section 5
+
+This is sample documentation text for illustration only.","2026-01-13T23:59:45.113Z","3","Example text for MDChunk 5, for illustration only.","src/example/module5/Sample5","053","FS","MDChunk"

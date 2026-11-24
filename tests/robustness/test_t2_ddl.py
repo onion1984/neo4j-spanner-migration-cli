@@ -229,7 +229,7 @@ def test_F06_cast_null_string_max(t2_results):
 
 def test_F07_cast_conflicting_types(t2_results):
     r1, r2 = t2_results["F07_cast_array_to_string"], t2_results["F07b_cast_int_to_string"]
-    check(_ok_or_failfast(r1, "val") and _ok(r2), "H09", "F-07", f"ARRAY vs INT64: {_err(r1)}\nINT64 vs STRING: {_err(r2)}", severity="P0",
+    check(_ok_or_failfast(r1, "val") and _ok_or_failfast(r2, "score"), "H09", "F-07", f"ARRAY vs INT64: {_err(r1)}\nINT64 vs STRING: {_err(r2)}", severity="P0",
           title="Shared edge labels emit CAST(... AS STRING(MAX)) that Spanner rejects")
 
 

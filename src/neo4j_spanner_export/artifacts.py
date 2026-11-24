@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 from collections import defaultdict
+from dataclasses import dataclass
 import json
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -19,7 +20,7 @@ from .naming import (
     validate_identifier,
 )
 from .serializer import EMPTY_BYTES_SENTINEL, SerializerConfig
-from .types import array_element_type, is_array_type
+from .types import array_element_type
 
 if TYPE_CHECKING:
     from .exporter import ExportSummary
@@ -38,7 +39,7 @@ def _render_create_tables_sql(mapping: SchemaMapping) -> str:
     ]
 
     for nm in mapping.nodes.values():
-        cols = get_node_columns(nm)
+        cols = get_node_columns(nm, mapping.property_type_overrides)
         col_defs = []
         for c in cols:
             not_null = " NOT NULL" if c.is_pk else ""
@@ -51,7 +52,7 @@ def _render_create_tables_sql(mapping: SchemaMapping) -> str:
     for em in mapping.edges.values():
         src_node = mapping.nodes[em.src_label]
         dst_node = mapping.nodes[em.dst_label]
-        cols = get_edge_columns(em, src_node, dst_node)
+        cols = get_edge_columns(em, src_node, dst_node, mapping.property_type_overrides)
         col_defs = []
         for c in cols:
             not_null = " NOT NULL" if c.is_pk else ""
@@ -102,9 +103,17 @@ def _render_arrays_scripts(mapping: SchemaMapping) -> tuple[str, str, str]:
         )
 
     for nm in mapping.nodes.values():
-        _collect(nm.spanner_table, get_node_columns(nm))
+        _collect(nm.spanner_table, get_node_columns(nm, mapping.property_type_overrides))
     for em in mapping.edges.values():
-        _collect(em.spanner_table, get_edge_columns(em, mapping.nodes[em.src_label], mapping.nodes[em.dst_label]))
+        _collect(
+            em.spanner_table,
+            get_edge_columns(
+                em,
+                mapping.nodes[em.src_label],
+                mapping.nodes[em.dst_label],
+                mapping.property_type_overrides,
+            ),
+        )
 
     return (
         "\n".join(add_lines) + "\n",
@@ -136,9 +145,17 @@ def _render_unescape_sql(mapping: SchemaMapping) -> str:
         lines.append(f"UPDATE {table_name} SET {', '.join(sets)} WHERE {' OR '.join(conds)};")
 
     for nm in mapping.nodes.values():
-        _collect(nm.spanner_table, get_node_columns(nm))
+        _collect(nm.spanner_table, get_node_columns(nm, mapping.property_type_overrides))
     for em in mapping.edges.values():
-        _collect(em.spanner_table, get_edge_columns(em, mapping.nodes[em.src_label], mapping.nodes[em.dst_label]))
+        _collect(
+            em.spanner_table,
+            get_edge_columns(
+                em,
+                mapping.nodes[em.src_label],
+                mapping.nodes[em.dst_label],
+                mapping.property_type_overrides,
+            ),
+        )
 
     return "\n".join(lines) + "\n"
 
@@ -161,9 +178,17 @@ def _render_empty_bytes_sql(mapping: SchemaMapping) -> str:
             )
 
     for nm in mapping.nodes.values():
-        _collect(nm.spanner_table, get_node_columns(nm))
+        _collect(nm.spanner_table, get_node_columns(nm, mapping.property_type_overrides))
     for em in mapping.edges.values():
-        _collect(em.spanner_table, get_edge_columns(em, mapping.nodes[em.src_label], mapping.nodes[em.dst_label]))
+        _collect(
+            em.spanner_table,
+            get_edge_columns(
+                em,
+                mapping.nodes[em.src_label],
+                mapping.nodes[em.dst_label],
+                mapping.property_type_overrides,
+            ),
+        )
 
     return "\n".join(lines) + "\n"
 
@@ -176,7 +201,7 @@ def _render_constraints_indexes_sql(mapping: SchemaMapping) -> str:
     for em in mapping.edges.values():
         src_node = mapping.nodes[em.src_label]
         dst_node = mapping.nodes[em.dst_label]
-        cols = get_edge_columns(em, src_node, dst_node)
+        cols = get_edge_columns(em, src_node, dst_node, mapping.property_type_overrides)
 
         src_pk_cols = [c.spanner_column for c in cols if c.role == "src_pk"]
         dst_pk_cols = [c.spanner_column for c in cols if c.role == "dst_pk"]
@@ -199,39 +224,87 @@ def _render_constraints_indexes_sql(mapping: SchemaMapping) -> str:
     return "\n".join(lines)
 
 
-def _can_cast_in_graph_ddl(src_type: str, dst_type: str) -> bool:
-    """Return True if Spanner Graph DDL supports CAST(col AS dst_type) from src_type."""
-    if src_type == dst_type:
-        return True
-    if is_array_type(src_type) or src_type == "JSON":
-        return False
-    if {src_type, dst_type} == {"INT64", "FLOAT64"}:
-        return dst_type == "FLOAT64"
-    return dst_type == "STRING(MAX)"
+@dataclass(frozen=True)
+class GraphPropertyConflict:
+    """A graph-wide (case-insensitive) property name declared with multiple Spanner types."""
+
+    prop_key: str
+    display_names: tuple[str, ...]
+    occurrences_by_type: dict[str, tuple[str, ...]]
 
 
-def _render_property_graph_sql(mapping: SchemaMapping, graph_name: str = "MigratedGraph") -> str:
+def find_graph_property_conflicts(mapping: SchemaMapping) -> list[GraphPropertyConflict]:
+    """Find all property names with conflicting Spanner types across all node and edge tables.
+
+    Spanner Graph evaluates property names case-insensitively in a single graph-wide namespace
+    spanning all NODE TABLES and EDGE TABLES.
+    """
+    by_lower: dict[str, dict[str, list[str]]] = defaultdict(lambda: defaultdict(list))
+    display_names: dict[str, set[str]] = defaultdict(set)
+
+    for nm in mapping.nodes.values():
+        for c in get_node_columns(nm, mapping.property_type_overrides):
+            prop_alias = nm.column_renames.get(c.raw_name, c.raw_name)
+            low = prop_alias.lower()
+            display_names[low].add(prop_alias)
+            by_lower[low][c.final_type].append(f"node {nm.spanner_table}")
+
+    for em in mapping.edges.values():
+        src_node = mapping.nodes[em.src_label]
+        dst_node = mapping.nodes[em.dst_label]
+        for c in get_edge_columns(em, src_node, dst_node, mapping.property_type_overrides):
+            if c.role in ("src_pk", "dst_pk"):
+                continue
+            prop_alias = em.column_renames.get(c.raw_name, c.raw_name)
+            low = prop_alias.lower()
+            display_names[low].add(prop_alias)
+            by_lower[low][c.final_type].append(f"edge {em.spanner_table}")
+
+    conflicts: list[GraphPropertyConflict] = []
+    for low in sorted(by_lower):
+        tmap = by_lower[low]
+        if len(tmap) > 1:
+            conflicts.append(
+                GraphPropertyConflict(
+                    prop_key=low,
+                    display_names=tuple(sorted(display_names[low])),
+                    occurrences_by_type={
+                        t: tuple(sorted(set(tbls))) for t, tbls in sorted(tmap.items())
+                    },
+                )
+            )
+    return conflicts
+
+
+def _format_table_sample(tables: tuple[str, ...], limit: int = 5) -> str:
+    if len(tables) <= limit:
+        return ", ".join(tables)
+    return f"{', '.join(tables[:limit])}, ... (+{len(tables) - limit} more)"
+
+
+def validate_property_graph_schema(
+    mapping: SchemaMapping,
+    graph_name: str = "MigratedGraph",
+) -> None:
+    """Validate all Spanner CREATE PROPERTY GRAPH invariants before exporting or generating DDL.
+
+    Checks:
+    - Property graph identifier validity
+    - Graph LABEL and property alias validity
+    - Graph-wide case-insensitive property type consistency across ALL node and edge tables
+    - Case-insensitive LABEL property signature consistency across node and edge tables
+    """
     validate_identifier(graph_name, graph_name, "graph", "property graph", "graph_name")
 
-    # Track graph-wide label property signatures (for DEF-006 & DEF-035) and node property types.
-    node_prop_types: dict[str, tuple[str, str]] = {}
-    label_signatures: dict[str, dict[str, str]] = {}
-
-    node_defs: list[str] = []
+    # 1. Validate aliases on all nodes and edges
     for nm in mapping.nodes.values():
-        cols = get_node_columns(nm)
-        pk_cols = [c.spanner_column for c in cols if c.is_pk]
-        node_label_alias = nm.raw_label
         validate_graph_alias(
-            node_label_alias,
+            nm.raw_label,
             kind="LABEL",
             scope=f"node table {nm.spanner_table!r}",
             yaml_hint_section="table_renames",
         )
-
-        prop_exprs: list[str] = []
-        sig: dict[str, str] = {}
-        for c in cols:
+        for c in get_node_columns(nm, mapping.property_type_overrides):
             prop_alias = nm.column_renames.get(c.raw_name, c.raw_name)
             validate_graph_alias(
                 prop_alias,
@@ -239,38 +312,17 @@ def _render_property_graph_sql(mapping: SchemaMapping, graph_name: str = "Migrat
                 scope=f"node table {nm.spanner_table!r}",
                 yaml_hint_section=f"nodes.{nm.raw_label}.column_renames",
             )
-            prev = node_prop_types.get(prop_alias)
-            if prev is not None and prev[0] != c.final_type:
-                raise NamingError(
-                    f"Property {prop_alias!r} has conflicting types across node tables: "
-                    f"{prev[1]} has {prev[0]} vs {nm.spanner_table} has {c.final_type}. "
-                    f"Fix by adding a rename under `nodes.{nm.raw_label}.column_renames` or aligning types via `override`."
-                )
-            node_prop_types[prop_alias] = (c.final_type, nm.spanner_table)
-            sig[prop_alias] = c.final_type
-            prop_exprs.append(f"{c.spanner_column} AS {spanner_backtick(prop_alias)}")
 
-        if node_label_alias in label_signatures and label_signatures[node_label_alias] != sig:
-            raise NamingError(
-                f"Graph LABEL {node_label_alias!r} is declared multiple times with different property sets."
-            )
-        label_signatures[node_label_alias] = sig
-
-        node_defs.append(
-            f"  {nm.spanner_table}\n"
-            f"    KEY ({', '.join(pk_cols)})\n"
-            f"    LABEL {spanner_backtick(node_label_alias)}\n"
-            f"    PROPERTIES ({', '.join(prop_exprs)})"
-        )
-
-    # Group edge properties by rel_type so polymorphic tables sharing a LABEL
-    # declare the exact same set of property names and types (Spanner Graph requirement).
-    label_prop_types: dict[str, dict[str, str]] = defaultdict(dict)
     for em in mapping.edges.values():
+        validate_graph_alias(
+            em.rel_type,
+            kind="LABEL",
+            scope=f"edge table {em.spanner_table!r}",
+            yaml_hint_section="table_renames",
+        )
         src_node = mapping.nodes[em.src_label]
         dst_node = mapping.nodes[em.dst_label]
-        cols = get_edge_columns(em, src_node, dst_node)
-        for c in cols:
+        for c in get_edge_columns(em, src_node, dst_node, mapping.property_type_overrides):
             if c.role in ("src_pk", "dst_pk"):
                 continue
             prop_alias = em.column_renames.get(c.raw_name, c.raw_name)
@@ -280,70 +332,125 @@ def _render_property_graph_sql(mapping: SchemaMapping, graph_name: str = "Migrat
                 scope=f"edge table {em.spanner_table!r}",
                 yaml_hint_section=f"edges.{em.triplet_key}.column_renames",
             )
-            prev = label_prop_types[em.rel_type].get(prop_alias)
-            if prev is None:
-                label_prop_types[em.rel_type][prop_alias] = c.final_type
-            elif prev != c.final_type:
-                if {prev, c.final_type} == {"INT64", "FLOAT64"}:
-                    label_prop_types[em.rel_type][prop_alias] = "FLOAT64"
-                elif _can_cast_in_graph_ddl(prev, "STRING(MAX)") and _can_cast_in_graph_ddl(c.final_type, "STRING(MAX)"):
-                    label_prop_types[em.rel_type][prop_alias] = "STRING(MAX)"
-                else:
-                    raise NamingError(
-                        f"Edge property {prop_alias!r} on shared LABEL {em.rel_type!r} has incompatible types "
-                        f"({prev} vs {c.final_type}) that cannot be CAST in Spanner Graph DDL. "
-                        f"Fix by adding a rename under `edges.{em.triplet_key}.column_renames` or aligning types via `override`."
-                    )
+
+    # 2. Check graph-wide property type conflicts across ALL node & edge tables (case-insensitive)
+    conflicts = find_graph_property_conflicts(mapping)
+    if conflicts:
+        lines = [
+            f"Found {len(conflicts)} graph-wide property(s) with conflicting types across node/edge tables "
+            f"(Spanner CREATE PROPERTY GRAPH requires every occurrence of a property name, case-insensitively, "
+            f"to share one Spanner type):"
+        ]
+        for conf in conflicts:
+            names_str = "/".join(repr(n) for n in conf.display_names)
+            parts = [
+                f"{sp_type} ({_format_table_sample(tbls)})"
+                for sp_type, tbls in conf.occurrences_by_type.items()
+            ]
+            lines.append(f"  - {names_str}: {'; '.join(parts)}")
+        lines.append(
+            "Fix by adding `property_type_overrides` at the top level of schema_mapping.yaml "
+            "(e.g. `property_type_overrides: {prop: STRING(MAX)}`), setting per-table `override`s, "
+            "or renaming via `column_renames`."
+        )
+        raise NamingError("\n".join(lines))
+
+    # 3. Check case-insensitive LABEL property signature consistency across nodes & edges
+    label_signatures: dict[str, tuple[str, dict[str, str]]] = {}
+    for nm in mapping.nodes.values():
+        lbl_low = nm.raw_label.lower()
+        sig = {
+            nm.column_renames.get(c.raw_name, c.raw_name).lower(): c.final_type
+            for c in get_node_columns(nm, mapping.property_type_overrides)
+        }
+        if lbl_low in label_signatures and label_signatures[lbl_low][1] != sig:
+            raise NamingError(
+                f"Graph LABEL {nm.raw_label!r} is declared multiple times with different property sets."
+            )
+        label_signatures[lbl_low] = (nm.raw_label, sig)
+
+    edge_label_sigs: dict[str, dict[str, str]] = defaultdict(dict)
+    for em in mapping.edges.values():
+        lbl_low = em.rel_type.lower()
+        src_node = mapping.nodes[em.src_label]
+        dst_node = mapping.nodes[em.dst_label]
+        for c in get_edge_columns(em, src_node, dst_node, mapping.property_type_overrides):
+            if c.role in ("src_pk", "dst_pk"):
+                continue
+            prop_alias = em.column_renames.get(c.raw_name, c.raw_name)
+            edge_label_sigs[lbl_low][prop_alias.lower()] = c.final_type
+
+    for em in mapping.edges.values():
+        lbl_low = em.rel_type.lower()
+        shared_sig = edge_label_sigs[lbl_low]
+        if lbl_low in label_signatures and label_signatures[lbl_low][1] != shared_sig:
+            raise NamingError(
+                f"Relationship type {em.rel_type!r} shares LABEL {label_signatures[lbl_low][0]!r} with a node label "
+                f"but has different properties. Rename the label or relationship type."
+            )
+        label_signatures[lbl_low] = (em.rel_type, dict(shared_sig))
+
+
+def _render_property_graph_sql(mapping: SchemaMapping, graph_name: str = "MigratedGraph") -> str:
+    validate_property_graph_schema(mapping, graph_name=graph_name)
+
+    node_defs: list[str] = []
+    for nm in mapping.nodes.values():
+        cols = get_node_columns(nm, mapping.property_type_overrides)
+        pk_cols = [c.spanner_column for c in cols if c.is_pk]
+        prop_exprs = [
+            f"{c.spanner_column} AS {spanner_backtick(nm.column_renames.get(c.raw_name, c.raw_name))}"
+            for c in cols
+        ]
+        node_defs.append(
+            f"  {nm.spanner_table}\n"
+            f"    KEY ({', '.join(pk_cols)})\n"
+            f"    LABEL {spanner_backtick(nm.raw_label)}\n"
+            f"    PROPERTIES ({', '.join(prop_exprs)})"
+        )
+
+    # Group edge properties by rel_type (case-insensitive) so polymorphic tables sharing a LABEL
+    # declare the exact same set of property names (casting missing columns to NULL).
+    label_prop_types: dict[str, dict[str, tuple[str, str]]] = defaultdict(dict)
+    for em in mapping.edges.values():
+        lbl_low = em.rel_type.lower()
+        src_node = mapping.nodes[em.src_label]
+        dst_node = mapping.nodes[em.dst_label]
+        for c in get_edge_columns(em, src_node, dst_node, mapping.property_type_overrides):
+            if c.role in ("src_pk", "dst_pk"):
+                continue
+            prop_alias = em.column_renames.get(c.raw_name, c.raw_name)
+            prop_low = prop_alias.lower()
+            if prop_low not in label_prop_types[lbl_low]:
+                label_prop_types[lbl_low][prop_low] = (prop_alias, c.final_type)
 
     edge_defs: list[str] = []
     for em in mapping.edges.values():
         src_node = mapping.nodes[em.src_label]
         dst_node = mapping.nodes[em.dst_label]
-        cols = get_edge_columns(em, src_node, dst_node)
+        cols = get_edge_columns(em, src_node, dst_node, mapping.property_type_overrides)
         pk_cols = [c.spanner_column for c in cols if c.is_pk]
         src_pk_cols = [c.spanner_column for c in cols if c.role == "src_pk"]
         dst_pk_cols = [c.spanner_column for c in cols if c.role == "dst_pk"]
         src_ref_cols = [src_node.properties[pk].spanner_column for pk in src_node.pk_columns]
         dst_ref_cols = [dst_node.properties[pk].spanner_column for pk in dst_node.pk_columns]
 
-        edge_label_alias = em.rel_type
-        validate_graph_alias(
-            edge_label_alias,
-            kind="LABEL",
-            scope=f"edge table {em.spanner_table!r}",
-            yaml_hint_section="table_renames",
-        )
-
-        cols_by_alias = {
-            em.column_renames.get(c.raw_name, c.raw_name): c
+        cols_by_alias_lower = {
+            em.column_renames.get(c.raw_name, c.raw_name).lower(): c
             for c in cols
             if c.role not in ("src_pk", "dst_pk")
         }
-        shared_props = label_prop_types[em.rel_type]
-        if edge_label_alias in label_signatures and label_signatures[edge_label_alias] != shared_props:
-            raise NamingError(
-                f"Relationship type {em.rel_type!r} shares LABEL {edge_label_alias!r} with a node label "
-                f"but has different properties. Rename the label or relationship type."
-            )
-        label_signatures[edge_label_alias] = dict(shared_props)
+        shared_props = label_prop_types[em.rel_type.lower()]
 
         if shared_props:
             prop_exprs = []
-            for prop_alias in sorted(shared_props):
-                target_type = shared_props[prop_alias]
-                if prop_alias in cols_by_alias:
-                    c = cols_by_alias[prop_alias]
-                    if c.final_type == target_type:
-                        prop_exprs.append(f"{c.spanner_column} AS {spanner_backtick(prop_alias)}")
-                    else:
-                        if not _can_cast_in_graph_ddl(c.final_type, target_type):
-                            raise NamingError(
-                                f"Cannot CAST {c.spanner_column} ({c.final_type}) to {target_type} "
-                                f"in edge table {em.spanner_table!r}."
-                            )
-                        prop_exprs.append(f"CAST({c.spanner_column} AS {target_type}) AS {spanner_backtick(prop_alias)}")
+            for prop_low in sorted(shared_props):
+                canonical_alias, target_type = shared_props[prop_low]
+                if prop_low in cols_by_alias_lower:
+                    c = cols_by_alias_lower[prop_low]
+                    prop_exprs.append(f"{c.spanner_column} AS {spanner_backtick(canonical_alias)}")
                 else:
-                    prop_exprs.append(f"CAST(NULL AS {target_type}) AS {spanner_backtick(prop_alias)}")
+                    prop_exprs.append(f"CAST(NULL AS {target_type}) AS {spanner_backtick(canonical_alias)}")
             props_clause = f"PROPERTIES ({', '.join(prop_exprs)})"
         else:
             props_clause = "NO PROPERTIES"
@@ -353,7 +460,7 @@ def _render_property_graph_sql(mapping: SchemaMapping, graph_name: str = "Migrat
             f"    KEY ({', '.join(pk_cols)})\n"
             f"    SOURCE KEY ({', '.join(src_pk_cols)}) REFERENCES {em.src_table} ({', '.join(src_ref_cols)})\n"
             f"    DESTINATION KEY ({', '.join(dst_pk_cols)}) REFERENCES {em.dst_table} ({', '.join(dst_ref_cols)})\n"
-            f"    LABEL {spanner_backtick(edge_label_alias)}\n"
+            f"    LABEL {spanner_backtick(em.rel_type)}\n"
             f"    {props_clause}"
         )
 
@@ -653,9 +760,20 @@ def generate_artifacts(
         _render_property_graph_sql(mapping, graph_name=graph_name), encoding="utf-8"
     )
 
-    node_tables = [(nm.spanner_table, get_node_columns(nm)) for nm in mapping.nodes.values()]
+    node_tables = [
+        (nm.spanner_table, get_node_columns(nm, mapping.property_type_overrides))
+        for nm in mapping.nodes.values()
+    ]
     edge_tables = [
-        (em.spanner_table, get_edge_columns(em, mapping.nodes[em.src_label], mapping.nodes[em.dst_label]))
+        (
+            em.spanner_table,
+            get_edge_columns(
+                em,
+                mapping.nodes[em.src_label],
+                mapping.nodes[em.dst_label],
+                mapping.property_type_overrides,
+            ),
+        )
         for em in mapping.edges.values()
     ]
 

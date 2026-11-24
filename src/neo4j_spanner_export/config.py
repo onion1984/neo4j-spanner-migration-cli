@@ -45,6 +45,27 @@ class PropertyMapping:
         return self.override if self.override else self.resolved
 
 
+def resolve_effective_type(
+    pm: PropertyMapping,
+    property_type_overrides: dict[str, str] | None = None,
+    *,
+    prop_alias: str | None = None,
+) -> str:
+    """Resolve effective Spanner type with precedence: per-table override > global property_type_overrides > resolved."""
+    if pm.override:
+        return pm.override
+    if property_type_overrides:
+        lowered = {k.lower(): v for k, v in property_type_overrides.items()}
+        if prop_alias is not None:
+            hit = lowered.get(prop_alias.lower())
+            if hit:
+                return hit
+        hit = lowered.get(pm.raw_name.lower())
+        if hit:
+            return hit
+    return pm.resolved
+
+
 @dataclass
 class NodeTableMapping:
     """Mapping for one canonical Neo4j label -> Spanner node table."""
@@ -92,6 +113,7 @@ class SchemaMapping:
     label_priority: list[str] = field(default_factory=list)
     table_renames: dict[str, str] = field(default_factory=dict)
     pk_overrides: dict[str, list[str]] = field(default_factory=dict)
+    property_type_overrides: dict[str, str] = field(default_factory=dict)
     nodes: dict[str, NodeTableMapping] = field(default_factory=dict)
     edges: dict[str, EdgeTripletMapping] = field(default_factory=dict)
 
@@ -143,6 +165,10 @@ class SchemaMapping:
             v_copy["properties"] = props
             edges[k] = _construct_dc(EdgeTripletMapping, v_copy, f"edges.{k}")
 
+        raw_prop_overrides = data.get("property_type_overrides") or {}
+        if not isinstance(raw_prop_overrides, dict):
+            raise ConfigError("`property_type_overrides` in schema_mapping.yaml must be a mapping")
+
         return cls(
             version=int(data.get("version", 1)),
             neo4j_version=str(data.get("neo4j_version", "")),
@@ -151,6 +177,9 @@ class SchemaMapping:
             table_renames=dict(data.get("table_renames") or {}),
             pk_overrides={
                 k: list(v) for k, v in (data.get("pk_overrides") or {}).items()
+            },
+            property_type_overrides={
+                str(k): str(v) for k, v in raw_prop_overrides.items()
             },
             nodes=nodes,
             edges=edges,
@@ -170,18 +199,38 @@ def validate_mapping(mapping: SchemaMapping) -> None:
     if not mapping.nodes:
         raise ConfigError("Schema mapping defines 0 node tables; nothing to export or generate.")
 
+    seen_global_lower: dict[str, tuple[str, str]] = {}
+    for prop_name, sp_type in mapping.property_type_overrides.items():
+        if not is_valid_spanner_type(sp_type):
+            raise ConfigError(
+                f"Invalid Spanner type {sp_type!r} in property_type_overrides.{prop_name}."
+            )
+        low = prop_name.lower()
+        if low in seen_global_lower and seen_global_lower[low][1] != sp_type:
+            other_name, other_type = seen_global_lower[low]
+            raise ConfigError(
+                f"Conflicting case-insensitive entries in property_type_overrides: "
+                f"{other_name!r} ({other_type}) vs {prop_name!r} ({sp_type})."
+            )
+        seen_global_lower[low] = (prop_name, sp_type)
+
     for label, nm in mapping.nodes.items():
         if not nm.pk_columns:
             raise ConfigError(f"Node table {label!r} has no pk_columns.")
         for prop_name, pm in nm.properties.items():
-            if not is_valid_spanner_type(pm.effective_type):
+            alias = nm.column_renames.get(prop_name, prop_name)
+            eff = resolve_effective_type(pm, mapping.property_type_overrides, prop_alias=alias)
+            if not is_valid_spanner_type(eff):
                 raise ConfigError(
-                    f"Invalid Spanner type {pm.effective_type!r} on {label}.{prop_name}."
+                    f"Invalid Spanner type {eff!r} on {label}.{prop_name}."
                 )
         for pk_col in nm.pk_columns:
             if pk_col not in nm.properties:
                 raise ConfigError(f"Primary key column {pk_col!r} missing from {label}.properties.")
-            pk_type = nm.properties[pk_col].effective_type
+            pk_alias = nm.column_renames.get(pk_col, pk_col)
+            pk_type = resolve_effective_type(
+                nm.properties[pk_col], mapping.property_type_overrides, prop_alias=pk_alias
+            )
             if not is_legal_pk_type(pk_type):
                 raise ConfigError(
                     f"Column {label}.{pk_col} has type {pk_type}, which is not legal as a Spanner PRIMARY KEY."
@@ -193,9 +242,11 @@ def validate_mapping(mapping: SchemaMapping) -> None:
         if em.dst_label not in mapping.nodes:
             raise ConfigError(f"Edge {key!r} references unknown dst_label {em.dst_label!r}.")
         for prop_name, pm in em.properties.items():
-            if not is_valid_spanner_type(pm.effective_type):
+            alias = em.column_renames.get(prop_name, prop_name)
+            eff = resolve_effective_type(pm, mapping.property_type_overrides, prop_alias=alias)
+            if not is_valid_spanner_type(eff):
                 raise ConfigError(
-                    f"Invalid Spanner type {pm.effective_type!r} on {key}.{prop_name}."
+                    f"Invalid Spanner type {eff!r} on {key}.{prop_name}."
                 )
 
 

@@ -1,0 +1,6 @@
+":START_ID",":END_ID",":TYPE","imported_at:datetime","reviewed_at:datetime","reviewed_by","migratedFrom","review_status"
+"1","2","DEPENDS_ON_APP","2026-04-12T08:17Z","2026-06-26T21:19:29.873Z","John Sample","sample_value_1","sample_value_1"
+"2","3","DEPENDS_ON_APP","2026-09-21T06:43Z","2026-05-14T14:55:52.737Z","Alex Demo","sample_value_2","sample_value_2"
+"3","4","DEPENDS_ON_APP","2026-08-18T07:06Z","2026-10-13T14:12:57.778Z","Sam Placeholder","sample_value_3","sample_value_3"
+"4","5","DEPENDS_ON_APP","2026-10-05T20:32Z","2026-07-03T15:21:54.357Z","Kim Example","sample_value_4","sample_value_4"
+"5","1","DEPENDS_ON_APP","2026-10-24T06:16Z","2026-04-13T23:32:46.718Z","Pat Sample","sample_value_5","sample_value_5"

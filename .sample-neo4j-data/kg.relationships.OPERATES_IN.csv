@@ -1,0 +1,6 @@
+":START_ID",":END_ID",":TYPE","imported_at:datetime","reviewed_at:datetime","review_status","reviewed_by","importedAt:datetime","source","importBatch"
+"1","32","OPERATES_IN","2026-03-19T21:13Z","2026-09-12T10:18:13.147Z","AUTO_TRUST","John Sample","2026-10-13T06:45:17.451Z","leanix","full-catalog"
+"17","33","OPERATES_IN","2026-07-29T13:24Z","2026-02-07T15:19:39.481Z","NEEDS_REVIEW","Alex Demo","2026-07-08T05:16:42.206Z","leanix","full-catalog"
+"3","29","OPERATES_IN","2026-09-02T19:50Z","2026-06-16T02:59:14.906Z","AUTO_TRUST","Sam Placeholder","2026-07-16T18:32:08.295Z","leanix","full-catalog"
+"4","35","OPERATES_IN","2026-10-05T22:03Z","2026-02-05T18:04:27.934Z","NEEDS_REVIEW","Kim Example","2026-07-07T04:29:44.794Z","leanix","full-catalog"
+"20","31","OPERATES_IN","2026-09-26T13:21Z","2026-08-07T20:12:54.712Z","AUTO_TRUST","Pat Sample","2026-09-10T06:37:05.707Z","leanix","full-catalog"

@@ -196,7 +196,9 @@ def _normalize_neo4j_expected(raw_val: Any, col: ColumnSpec, default_tz: str) ->
         return int(raw_val)
     if ft == "BOOL":
         return bool(raw_val)
-    if isinstance(raw_val, (Neo4jTime, Neo4jDuration, Neo4jDate, Neo4jDateTime)):
+    if isinstance(raw_val, Neo4jDateTime):
+        return _neo4j_to_json_val(raw_val, default_tz)
+    if isinstance(raw_val, (Neo4jTime, Neo4jDuration, Neo4jDate)):
         return raw_val.iso_format()
     if isinstance(raw_val, (datetime.time, datetime.date, datetime.datetime)):
         return raw_val.isoformat()
@@ -326,8 +328,9 @@ def _sample_node_table(
     sample_rows: int,
     rng: random.Random,
     default_tz: str,
+    property_type_overrides: dict[str, str] | None = None,
 ) -> SampleRowCheck:
-    cols = get_node_columns(nm)
+    cols = get_node_columns(nm, property_type_overrides)
     pk_cols = [c for c in cols if c.is_pk]
     pk_names = [c.spanner_column for c in pk_cols]
     all_names = [c.spanner_column for c in cols]
@@ -412,8 +415,9 @@ def _sample_edge_table(
     sample_rows: int,
     rng: random.Random,
     default_tz: str,
+    property_type_overrides: dict[str, str] | None = None,
 ) -> SampleRowCheck:
-    cols = get_edge_columns(em, src_node, dst_node)
+    cols = get_edge_columns(em, src_node, dst_node, property_type_overrides)
     pk_cols = [c for c in cols if c.is_pk]
     pk_names = [c.spanner_column for c in pk_cols]
     all_names = [c.spanner_column for c in cols]
@@ -616,7 +620,18 @@ def verify_migration(
 
     samples: list[SampleRowCheck] = []
     for nm in mapping.nodes.values():
-        samples.append(_sample_node_table(driver, neo4j_db, spanner_db, nm, sample_rows, rng, default_tz))
+        samples.append(
+            _sample_node_table(
+                driver,
+                neo4j_db,
+                spanner_db,
+                nm,
+                sample_rows,
+                rng,
+                default_tz,
+                property_type_overrides=mapping.property_type_overrides,
+            )
+        )
     for em in mapping.edges.values():
         samples.append(
             _sample_edge_table(
@@ -629,6 +644,7 @@ def verify_migration(
                 sample_rows,
                 rng,
                 default_tz,
+                property_type_overrides=mapping.property_type_overrides,
             )
         )
 

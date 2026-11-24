@@ -102,7 +102,7 @@ def test_def006_009_035_graph_ddl_conflicts(tmp_path: Path) -> None:
     c2 = mb.node("Company", ["cid"], {"cid": "STRING(MAX)"})
     e1 = mb.edge(p2, "TAGS", p2, props={"val": "ARRAY<INT64>"})
     e2 = mb.edge(p2, "TAGS", c2, props={"val": "INT64"})
-    with pytest.raises(NamingError, match="incompatible types"):
+    with pytest.raises(NamingError, match="conflicting types"):
         generate_artifacts(mb.mapping([p2, c2], [e1, e2]), tmp_path / "d9", "gs://b/run", SerializerConfig())
 
     # DEF-035: node label and rel_type with same name & different props
@@ -373,6 +373,115 @@ def test_verify_pk_predicate_tostring_override() -> None:
     pred_s, val_s = _neo4j_pk_predicate("n", pk_col, str_prop, "pk_0", "abc")
     assert pred_s == "n.`wk` = $pk_0"
     assert val_s == "abc"
+
+
+def test_graph_wide_property_conflicts_strict_and_batched(tmp_path: Path) -> None:
+    """Bug 1 (Option A) & Bug 2: detect node-node, edge-edge (same & diff rel), node-edge, and case-insensitive conflicts in one pass."""
+    from neo4j_spanner_export.artifacts import find_graph_property_conflicts, validate_property_graph_schema
+    from neo4j_spanner_export.discovery import render_discovery_report
+
+    a = mb.node("App", ["aid"], {"aid": "STRING(MAX)", "reviewed_at": "STRING(MAX)", "createdAt": "TIMESTAMP"})
+    b = mb.node("Svc", ["sid"], {"sid": "STRING(MAX)", "createdat": "STRING(MAX)"})
+    e_calls = mb.edge(a, "CALLS", b, props={"confidence": "FLOAT64", "reviewed_at": "TIMESTAMP"})
+    e_consumes = mb.edge(a, "CONSUMES", b, props={"confidence": "STRING(MAX)"})
+    e_rates_1 = mb.edge(a, "RATES", a, props={"score": "INT64"})
+    e_rates_2 = mb.edge(a, "RATES", b, props={"score": "STRING(MAX)"})
+
+    m = mb.mapping([a, b], [e_calls, e_consumes, e_rates_1, e_rates_2])
+    conflicts = find_graph_property_conflicts(m)
+    assert [c.prop_key for c in conflicts] == ["confidence", "createdat", "reviewed_at", "score"]
+
+    # Batched error reports ALL 4 conflicts at once
+    with pytest.raises(NamingError) as exc_info:
+        validate_property_graph_schema(m)
+    msg = str(exc_info.value)
+    assert "Found 4 graph-wide property(s) with conflicting types" in msg
+    for prop in ("confidence", "createdAt", "createdat", "reviewed_at", "score"):
+        assert prop in msg
+
+    # Discovery report renders all 4 conflicts + property_type_overrides snippet
+    report = render_discovery_report(m)
+    assert "## Graph-Wide Property Type Conflicts" in report
+    assert "property_type_overrides:" in report
+    for prop in ("confidence", "reviewed_at", "score"):
+        assert prop in report
+
+    # export_graph fails fast BEFORE touching driver or output_dir
+    out_dir = tmp_path / "should_not_exist"
+    with pytest.raises(NamingError, match="Found 4 graph-wide"):
+        export_graph(
+            driver=None,
+            database="neo4j",
+            mapping=m,
+            output_dir=out_dir,
+            serializer_cfg=SerializerConfig(),
+        )
+    assert not out_dir.exists()
+
+    # Resolving all 4 via top-level property_type_overrides makes validation & DDL succeed
+    m.property_type_overrides = {
+        "confidence": "STRING(MAX)",
+        "createdAt": "STRING(MAX)",
+        "reviewed_at": "STRING(MAX)",
+        "score": "STRING(MAX)",
+    }
+    validate_mapping(m)
+    assert find_graph_property_conflicts(m) == []
+    assert "## Graph-Wide Property Type Conflicts" not in render_discovery_report(m)
+    generate_artifacts(m, tmp_path / "resolved", "gs://b/run", SerializerConfig())
+    ddl = (tmp_path / "resolved" / "schema" / "01_create_tables.sql").read_text()
+    assert "confidence STRING(MAX)" in ddl
+    assert "reviewed_at STRING(MAX)" in ddl
+
+
+def test_property_type_overrides_precedence_and_validation(tmp_path: Path) -> None:
+    """Verify per-table override takes precedence over property_type_overrides, and invalid types fail."""
+    from neo4j_spanner_export.config import save_mapping
+    from neo4j_spanner_export.layout import get_node_columns
+
+    a = mb.node("App", ["aid"], {"aid": "STRING(MAX)", "ts": "TIMESTAMP", "x": "INT64"})
+    a.properties["x"].override = "FLOAT64"
+    m = mb.mapping([a])
+    m.property_type_overrides = {"ts": "STRING(MAX)", "x": "STRING(MAX)"}
+
+    # Round-trip YAML preserves property_type_overrides without mutating per-table override
+    yml = tmp_path / "m.yaml"
+    save_mapping(m, yml)
+    loaded = load_mapping(yml)
+    assert loaded.property_type_overrides == {"ts": "STRING(MAX)", "x": "STRING(MAX)"}
+    assert loaded.nodes["App"].properties["ts"].override is None
+
+    cols = {c.raw_name: c.final_type for c in get_node_columns(loaded.nodes["App"], loaded.property_type_overrides)}
+    assert cols["ts"] == "STRING(MAX)"
+    assert cols["x"] == "FLOAT64"  # per-table override wins
+
+    # Invalid type in property_type_overrides fails validate_mapping
+    loaded.property_type_overrides["ts"] = "VARCHAR"
+    with pytest.raises(ConfigError, match="property_type_overrides"):
+        validate_mapping(loaded)
+
+
+def test_case_insensitive_label_collision_rejected() -> None:
+    """Spanner Graph treats LABEL names case-insensitively across nodes and edges."""
+    from neo4j_spanner_export.artifacts import validate_property_graph_schema
+
+    k = mb.node("Knows", ["kid"], {"kid": "STRING(MAX)"})
+    p = mb.node("Person", ["pid"], {"pid": "STRING(MAX)"})
+    e = mb.edge(p, "KNOWS", k)
+    with pytest.raises(NamingError, match="shares LABEL"):
+        validate_property_graph_schema(mb.mapping([k, p], [e]))
+
+
+def test_verify_datetime_widened_to_string_matches_serializer() -> None:
+    """Neo4jDateTime widened/overridden to STRING(MAX) must format as UTC 'Z' in verify just like serializer."""
+    col_str = SimpleNamespace(final_type="STRING(MAX)", spanner_column="createdAt", raw_name="createdAt")
+    ndt = Neo4jDateTime(2026, 1, 28, 17, 46, 6, 78000000, tzinfo=datetime.timezone.utc)
+    serialized = coerce_value(ndt, "STRING(MAX)", "UTC")
+    expected = _normalize_neo4j_expected(ndt, col_str, "UTC")
+    assert serialized == "2026-01-28T17:46:06.078000000Z"
+    assert expected == serialized
+
+
 
 
 

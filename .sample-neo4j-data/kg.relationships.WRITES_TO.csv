@@ -1,0 +1,6 @@
+":START_ID",":END_ID",":TYPE","imported_at:datetime","migration_date:datetime","migrated_from_oracle_id","reviewed_at:datetime","reviewed_by","source","review_status"
+"91","277","WRITES_TO","2026-03-30T06:05Z","2026-09-08T22:18:22.720Z","205_JJQ_VEUQALZBO_NTFK_R_JOB","2026-08-29T18:36:07.735Z","John Sample","sample_value_1","sample_value_1"
+"92","278","WRITES_TO","2026-06-12T20:44Z","2026-03-22T05:23:23.848Z","167_YAT_UOZDSYKOI_QHWZ_A_QYNENT_GPPU_ZF","2026-10-12T20:07:32.838Z","Alex Demo","sample_value_2","sample_value_2"
+"93","279","WRITES_TO","2026-05-05T08:27Z","2026-03-27T15:25:39.578Z","881_RMC_OXNUHJXJM_FBPV_M_SVLJ_LYBZJOI","2026-09-29T19:18:22.290Z","Sam Placeholder","sample_value_3","sample_value_3"
+"94","280","WRITES_TO","2026-05-07T07:02Z","2026-06-29T14:05:11.932Z","229_MGG_FJSQDAEPP_IGFC_G_HKZMOYVBG_LKHROP","2026-07-13T09:08:55.801Z","Kim Example","sample_value_4","sample_value_4"
+"95","276","WRITES_TO","2026-10-02T05:11Z","2026-07-21T12:00:18.033Z","578_YBD_MUYXHTFJP_XXXR_N_WWJQ_MONUKIS","2026-09-16T11:55:28.439Z","Pat Sample","sample_value_5","sample_value_5"

@@ -8,6 +8,7 @@ import logging
 from pathlib import Path
 from typing import Any
 
+from .artifacts import find_graph_property_conflicts
 from .compat import (
     ConstraintInfo,
     cypher_ident,
@@ -22,6 +23,7 @@ from .config import (
     PropertyMapping,
     SchemaMapping,
     load_mapping,
+    resolve_effective_type,
     save_mapping,
     validate_mapping,
 )
@@ -235,6 +237,7 @@ def discover_schema(
     merged_priority = list(label_priority or (existing.label_priority if existing else []))
     table_renames = dict(existing.table_renames if existing else {})
     pk_overrides = dict(existing.pk_overrides if existing else {})
+    property_type_overrides = dict(existing.property_type_overrides if existing else {})
 
     compat = detect_neo4j_compat(driver, database)
     constraints = fetch_node_constraints(driver, database)
@@ -404,7 +407,11 @@ def discover_schema(
 
         if not is_synthetic:
             for pcol in pk_cols:
-                eff = prop_mappings[pcol].effective_type
+                eff = resolve_effective_type(
+                    prop_mappings[pcol],
+                    property_type_overrides,
+                    prop_alias=col_renames.get(pcol, pcol),
+                )
                 if not is_legal_pk_type(eff):
                     raise DiscoveryError(
                         f"PK column {pcol!r} on {canonical!r} has type {eff}, which is not legal as a Spanner PRIMARY KEY."
@@ -420,7 +427,11 @@ def discover_schema(
 
         monotonic_warn = False
         if not is_synthetic:
-            lead_type = prop_mappings[leading_pk_name].effective_type
+            lead_type = resolve_effective_type(
+                prop_mappings[leading_pk_name],
+                property_type_overrides,
+                prop_alias=col_renames.get(leading_pk_name, leading_pk_name),
+            )
             if lead_type in ("INT64", "TIMESTAMP") and _looks_monotonic(leading_pk_samples):
                 monotonic_warn = True
 
@@ -602,6 +613,7 @@ def discover_schema(
         label_priority=merged_priority,
         table_renames=table_renames,
         pk_overrides=pk_overrides,
+        property_type_overrides=property_type_overrides,
         nodes=node_mappings,
         edges=edge_mappings,
     )
@@ -611,6 +623,18 @@ def discover_schema(
     if report_path is not None:
         report_path.parent.mkdir(parents=True, exist_ok=True)
         report_path.write_text(render_discovery_report(mapping), encoding="utf-8")
+
+    graph_conflicts = find_graph_property_conflicts(mapping)
+    if graph_conflicts:
+        names = ", ".join("/".join(c.display_names) for c in graph_conflicts)
+        logger.warning(
+            "Detected %d graph-wide property type conflict(s) across node/edge tables (%s). "
+            "Resolve via `property_type_overrides` (or per-table `override` / `column_renames`) in %s "
+            "and re-run `discover` before exporting.",
+            len(graph_conflicts),
+            names,
+            output_mapping_path,
+        )
 
     return mapping
 
@@ -673,6 +697,46 @@ def render_discovery_report(mapping: SchemaMapping) -> str:
                 "store non-canonical labels in `secondary_labels` (`ARRAY<STRING(MAX)>`).",
                 "In Spanner GQL, filter by secondary label using `WHERE 'Label' IN UNNEST(n.secondary_labels)` "
                 "instead of `MATCH (n:Label)`.",
+            ]
+        )
+
+    graph_conflicts = find_graph_property_conflicts(mapping)
+    if graph_conflicts:
+        lines.extend(
+            [
+                "",
+                "## Graph-Wide Property Type Conflicts (Action Required Before Export)",
+                "",
+                "Cloud Spanner `CREATE PROPERTY GRAPH` requires every occurrence of a property name "
+                "(case-insensitively across all node and edge tables) to have the exact same Spanner type.",
+                "",
+                "| Property | Conflicting Types & Tables |",
+                "| :--- | :--- |",
+            ]
+        )
+        snippet_lines = ["property_type_overrides:"]
+        for conf in graph_conflicts:
+            prop_label = " / ".join(f"`{n}`" for n in conf.display_names)
+            detail_parts = []
+            for sp_type, tbls in conf.occurrences_by_type.items():
+                if len(tbls) <= 4:
+                    sample = ", ".join(f"`{t}`" for t in tbls)
+                else:
+                    sample = ", ".join(f"`{t}`" for t in tbls[:4]) + f", ... (+{len(tbls) - 4} more)"
+                detail_parts.append(f"**{sp_type}** ({len(tbls)}): {sample}")
+            lines.append(f"| {prop_label} | {'; '.join(detail_parts)} |")
+            types_set = set(conf.occurrences_by_type.keys())
+            suggested = "FLOAT64" if types_set == {"INT64", "FLOAT64"} else "STRING(MAX)"
+            snippet_lines.append(f"  {conf.display_names[0]}: {suggested}")
+        lines.extend(
+            [
+                "",
+                "Add a `property_type_overrides` block to `schema_mapping.yaml` (or use per-table `override` / "
+                "`column_renames`) and re-run `discover` to confirm 0 conflicts remain:",
+                "",
+                "```yaml",
+                *snippet_lines,
+                "```",
             ]
         )
 

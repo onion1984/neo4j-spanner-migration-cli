@@ -14,7 +14,11 @@ from neo4j.exceptions import DriverError, Neo4jError
 from rich.console import Console
 import yaml
 
-from .artifacts import generate_artifacts
+from .artifacts import (
+    find_graph_property_conflicts,
+    generate_artifacts,
+    validate_property_graph_schema,
+)
 from .config import ConfigError, load_mapping
 from .discovery import DiscoveryError, discover_schema
 from .exporter import export_graph
@@ -55,6 +59,13 @@ def _cmd_discover(args: argparse.Namespace) -> int:
         f"[green]Discovery complete:[/green] {len(mapping.nodes)} node table(s), "
         f"{len(mapping.edges)} edge triplet(s) -> {out_mapping} (report: {report_path})"
     )
+    graph_conflicts = find_graph_property_conflicts(mapping)
+    if graph_conflicts:
+        console.print(
+            f"[yellow]Warning:[/yellow] {len(graph_conflicts)} graph-wide property type conflict(s) detected "
+            f"across node/edge tables. Review {report_path}, add `property_type_overrides` (or per-table "
+            f"`override`/`column_renames`) in {out_mapping}, and re-run `discover` before `export`."
+        )
     return 0
 
 
@@ -67,6 +78,7 @@ def _cmd_export(args: argparse.Namespace) -> int:
     validate_gcs_prefix(args.gcs_prefix)
     validate_identifier(args.graph_name, args.graph_name, "graph", "property graph", "graph_name")
     mapping = load_mapping(args.mapping)
+    validate_property_graph_schema(mapping, graph_name=args.graph_name)
     out_dir = Path(args.output_dir)
     serializer_cfg = SerializerConfig(
         delimiter=args.delimiter,

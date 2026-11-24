@@ -1,0 +1,6 @@
+":START_ID",":END_ID",":TYPE","imported_at:datetime","reviewed_at:datetime","reviewed_by","match_type","review_status","source","createdAt"
+"51","232","MAPS_TO","2026-08-26T11:37Z","2026-03-14T08:39:00.281Z","John Sample","exact_same_app","IMPORTED","kscm-orm","Example value 1"
+"57","233","MAPS_TO","2026-08-01T07:15Z","2026-08-30T12:33:17.789Z","Alex Demo","exact_same_app","IMPORTED","name-matching","Example value 2"
+"53","234","MAPS_TO","2026-09-17T14:11Z","2026-02-16T03:28:46.677Z","Sam Placeholder","exact_same_app","IMPORTED","kscm-orm","Example value 3"
+"59","235","MAPS_TO","2026-07-22T05:44Z","2026-07-07T04:16:13.489Z","Kim Example","exact_same_app","IMPORTED","name-matching","Example value 4"
+"55","231","MAPS_TO","2026-10-01T04:53Z","2026-10-05T12:42:00.848Z","Pat Sample","exact_same_app","IMPORTED","kscm-orm","Example value 5"
